@@ -1,113 +1,51 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="sv">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  <meta charset="UTF-8">
+  <title>Aktörskarta Tröndelag & Jämtland Härjedalen</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body { margin:0; font-family: Arial, sans-serif; }
+    #map { height: 100vh; width: 70%; float: right; }
+    #sidebar { width: 30%; float: left; height: 100vh; overflow-y: scroll; padding: 10px; box-sizing: border-box; background: #f5f5f5; }
+    h2 { margin-top: 20px; }
+    .category { margin-bottom: 5px; }
+    .aktor { margin-left: 15px; }
+    select { width: 100%; margin-bottom: 10px; }
   </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="sv"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Aktörskarta&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;link</p>
-<p class="p1"><span class="Apple-converted-space">    </span>rel="stylesheet"</p>
-<p class="p1"><span class="Apple-converted-space">    </span>href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"</p>
-<p class="p1"><span class="Apple-converted-space">    </span>integrity="sha256-sA+zNcdx6P3pQ8z3A1Zy+uNHbC6UyjN1p3pbbpk0U+0="</p>
-<p class="p1"><span class="Apple-converted-space">    </span>crossorigin=""</p>
-<p class="p1"><span class="Apple-converted-space">  </span>/&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: Arial, sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>#sidebar {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 300px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background: #f7f7f7;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>border-right: 1px solid #ddd;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>overflow-y: auto;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>#map {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.category {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-weight: bold;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>ul {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>list-style: none;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>padding-left: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="sidebar"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;h2&gt;Aktörskarta&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="category-list"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="map"&gt;&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const aktorer = [</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: ["Samling Näringsliv","IUC Jämtland Härjedalen","Handelskammaren Mitt","Företagarna","Jämtland Härjedalen Turism (JHT)","Svenskt Näringsliv Jämtland","Nyföretagarcentrum","Lantbrukarnas riksorganisation (LRF)","Peak Inkubator"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Näringslivsorganisationer - Tröndelag", namn: ["NHO Næringslivets Hovedorganisasjon","Næringsforeningen i Trondheimsregionen (NiT)","Innherred Næringsforening","Rørosregionen Næringshage","Nasjonalparken Næringshage","FI Næringshage","Tindved Kulturhage","Næringshagen Hitra og Frøya","Blått Kompetansesenter AS","INAM AS (Innovasjon Namdal)","Thams Innovasjon AS","Naeringsforeningen i Vaernesregionen","Proneo","Fremtidens Industri AS (FI)","Trøndelag Reiseliv","Nordsec (tidigare Midsec)","Industrinavet i Tröndelag","RENERGY – Renewable Energy Cluster","WoodWorks! Cluster"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Offentliga aktörer - Tröndelag", namn: ["Statsforvalteren","Helse Midt-Norge RHF","Statens vägvesende","Politi","Tolletaten","NAV","Försvarskoordinatorn Tröndelag","Kommunförbundet Tröndelag","Skatteetaten"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Offentliga aktörer - Jämtland Härjedalen", namn: ["Länsstyrelsen","Arbetsförmedlingen","Polisen","Försäkringskassan","Tullverket","Skatteverket","Almi","Kommunförbundet JH","Sametinget","Samverket/Myndighetsnätverket"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Universitet, utbildnings och forskningsmiljöer - Jämtland Härjedalen", namn: ["Mittuniversitetet (MIUN)","Hushållningssällskapet","Torsta AB"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Universitet, utbildnings och forskningsmiljöer - Tröndelag", namn: ["Norwegian University of Science and Technology NTNU","NTNU:s Næringslivsringer","Dronning Mauds Minne Høgskole DMMH","Nord universitet (Campus Levanger, Steinkjer och Namsos)","Sintef","Falstadsenteret"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Gränsöverskridande samarbeten regionalt", namn: ["Gränsräddningsrådet","Samarbete mellan polisen","Tullsamarbete (Storlien och Vauldalen)","Platform North","Atlantbanan","Föreningen Norden i Östersund","Föreningen Norden i Trondheim"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Finansiering", namn: ["Interreg Sverige Norge Nordens gröna bälte","Interreg Aurora","Innovation Norge","Leader, tre föreningar i JH","Region JH","Tröndelag fylkeskommune","Tillväxtverket","ESF-rådet"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Nätverk för kompetens, kapital, företag etc", namn: ["Bærekraftsnettverket i Trøndelag","Work in Trondheim","Meetup – Nätverksträffar i Trondheim","Digs Incubator Trondheim","StartupTRD","House Bee","Gomorron / The remote lab","Ta Steget","Partnerskap Mittstråket","Business Region MidSweden","The Power Region","Driv Innovation","Vindkraftcentrum","E14 Invest","BNI City Östersund","BNI Executive Trondheim","Trondheim tech port","Connect Midt Norge"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Enskilda företag/bedrifter", namn: ["Uniper","Aneo","Ritek","Persson Invest","Meråker Kurbad"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Civilsamhället kultur - Tröndelag", namn: ["Trøndelag Kulturkrets","Kulturkontakt Trondheim","Trøndelag Teater","Rockheim","Sør-Trøndelag Folkemuseum","Stiklestad Nasjonale Kultursenter","Stiftinga Hilmar Alexandersen"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Civilsamhället kultur - Jämtland Härjedalen", namn: ["Gaaltije","Saemien Sijte","Jamtli","Heimbygda","Föreningsarkivet i Jämtlands län","RF-SISU Jämtland-Härjedalen","SPF Seniorerna Jämtland-Härjedalen","Kultur i Jämtland Härjedalen"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Gränsöverskridande samarbeten nationellt Norge - Sverige", namn: ["Grensetjänsten","Business Sweden","Svenska ambassaden i Oslo","Norska ambassaden i Stockholm","Norsksvenska handelskammaren","Sveriges generalkonsul i Trondheim"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Europeiska och nordiska samarbeten", namn: ["Nordiska ministerrådet","Nordiska rådet","Gränshinderrådet","Europaforum Norra Sverige (EFNS)","Northern Sparsely Populated Areas-nätverket (NSPA)","Trøndelag Europakontor","North Sweden European Office"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Andra gränskommittéer", namn: ["ARKO-samarbetet","Bothnian Arc (Bottenviksbågen)","Gränskommittén Innlandet-Dalarna","Grensekomiteen Värmland-Østfold","Greater Copenhagen (tidigare Öresundskommittén)","Kvarkenrådet","Midtskandia","Nordkalottrådet","Nordiska Skärgårdssamarbetet","Svinesundskommittén","Tornedalsrådet/Tornionlaakson neuvosto"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Kulturevent - Tröndelag", namn: ["Elden","Rørosmartnan","Kulturting Norr","Storsjöyran","Olavsfest","Basta – Litteraturhuset i Trondheim","Pstereo","Trondheim Rocks","Jazzfest","NEON Festivalen","Festningen","Steinkjerfestivalen","Trøndersk Matfestival","Trondheim Bryggerifestival","Stiklestadspelet – Spelet om Heilag Olav","Kortreist Dansefestival"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Kulturevent - Jämtland Härjedalen", namn: ["Funäs Festival","Jamtli Vårmarknad","Jamtli Julmarknad","Härdalsyran &amp; Härdalsveckan","Musikkväll på Kalfjäll","Kul Tur","Åre Sessions","Musikkväll vid Åresjön","Västgård Game Fair","Åre Höstmarknad"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Sportevent - Tröndelag", namn: ["Meråkerrennet","Norgescup Skiskyting","Erik Håker Cup","Knykenlekene (barn- och ungdomsfestival)","Trondheim Maraton","Lånkebanen Rallycross (NM och internationella tävlingar)","Skandia Cup (fotbollsturnering för barn &amp; ungdom)","Trondheimslekene","Rennebumartnan Skisprint (del av lokal skidhelg)","Julecup i Håndball","Leangen Travbanes stora travhelger (bl.a. Trøndersk Travfestival)","Tour de Trøndelag (cykel)","Birkebeiner-rennet på Røros/Trøndelag (regional upplaga)"]},</p>
-<p class="p1"><span class="Apple-converted-space">      </span>{ kategori: "Sportevent - Jämtland Härjedalen", namn: ["Storsjöcupen","Bruksvallsloppet","Fjälltopploppet","St Olavsloppet","Vårruset","Åre Bike Festival","Fjällmaratonveckan","Red Bull GIBAWAY","Vemdalsslalom (ungdom)","Skistar Winter Games (ungdom)","Damernas/Herrarnas alpina världscup","Trondheim Skishow","Granåsen NC / FIS Races"]}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>];</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const map = L.map('map').setView([63.5, 12.0], 6);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>maxZoom: 18,</p>
-<p class="p1"><span class="Apple-converted-space">      </span>attribution: '© OpenStreetMap'</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}).addTo(map);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const container = document.getElementById('category-list');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>aktorer.forEach(cat =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const div = document.createElement('div');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>div.className = 'category';</p>
-<p class="p1"><span class="Apple-converted-space">      </span>div.innerText = cat.kategori;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>const ul = document.createElement('ul');</p>
-<p class="p1"><span class="Apple-converted-space">      </span>cat.namn.forEach(namn =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const li = document.createElement('li');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>li.innerText = namn;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>ul.appendChild(li);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>container.appendChild(div);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>container.appendChild(ul);</p>
-<p class="p1"><span class="Apple-converted-space">    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
-</body>
-</html>
+  <div id="sidebar">
+    <h2>Kategorier</h2>
+    <div id="category-list"></div>
+
+    <h2>Filter på ort</h2>
+    <select id="ort-filter">
+      <option value="">Visa alla orter</option>
+    </select>
+
+    <h2>Aktörer</h2>
+    <div id="aktor-list"></div>
+  </div>
+
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Här definierar vi aktörer med kategori, namn, ort och koordinater
+    const aktorer = [
+      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Samling Näringsliv", ort: "Östersund", coords: [63.1792, 14.6357]},
+      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "IUC Jämtland Härjedalen", ort: "Östersund", coords: [63.1792, 14.6357]},
+      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Handelskammaren Mitt", ort: "Östersund", coords: [63.1792, 14.6357]},
+      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Företagarna", ort: "Östersund", coords: [63.1792, 14.6357]},
+      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Jämtland Härjedalen Turism (JHT)", ort: "Östersund", coords: [63.1792, 14.6357]},
+      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Svenskt Näringsliv Jämtland", ort: "Östersund", coords: [63.1792, 14.6357]},
+      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Nyföretagarcentrum", ort: "Östersund", coords: [63.1792, 14.6357]},
+      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Lantbrukarnas riksorganisation (LRF)", ort: "Östersund", coords: [63.1792, 14.6357]},
+      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Peak Inkubator", ort: "Östersund", coords: [63.1792, 14.6357]},
+
+      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "NHO Næringslivets Hovedorganisasjon", ort: "Trondheim", coords: [63.4305, 10.3951]},
+      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Næringsforeningen i Trondheimsregionen (NiT)", ort: "Trondheim", coords: [63.4305, 10.3951]},
+      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Innherred Næringsforening", ort: "Steinkjer", coords: [64.0143, 11.4962]},
+      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Rørosregionen Næringshage", ort: "Røros", coords: [62.5742, 11.3875]},
+      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Nasjonalparken Næringshage", ort: "Røros"
