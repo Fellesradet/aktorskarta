@@ -48,4 +48,90 @@
       {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Næringsforeningen i Trondheimsregionen (NiT)", ort: "Trondheim", coords: [63.4305, 10.3951]},
       {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Innherred Næringsforening", ort: "Steinkjer", coords: [64.0143, 11.4962]},
       {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Rørosregionen Næringshage", ort: "Røros", coords: [62.5742, 11.3875]},
-      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Nasjonalparken Næringshage", ort: "Røros"
+      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Nasjonalparken Næringshage", ort: "Røros", coords: [62.5742, 11.3875]},
+      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "FI Næringshage", ort: "Steinkjer", coords: [64.0143, 11.4962]},
+      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Tindved Kulturhage", ort: "Steinkjer", coords: [64.0143, 11.4962]},
+      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Næringshagen Hitra og Frøya", ort: "Hitra", coords: [63.4621, 9.6987]},
+      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Blått Kompetansesenter AS", ort: "Trondheim", coords: [63.4305, 10.3951]},
+      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "INAM AS (Innovasjon Namdal)", ort: "Namsos", coords: [64.4641, 11.5007]},
+      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Thams Innovasjon AS", ort: "Trondheim", coords: [63.4305, 10.3951]},
+      // ... fortsätt med alla aktörer på samma sätt
+    ];
+
+    // Skapa kartan
+    const map = L.map('map').setView([63.5, 12.0], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Skapa LayerGroups per kategori
+    const categoryLayers = {};
+    aktorer.forEach(a => {
+      if(!categoryLayers[a.kategori]) categoryLayers[a.kategori] = L.layerGroup();
+      const marker = L.marker(a.coords).bindPopup(`<b>${a.namn}</b><br>${a.ort}`);
+      marker.aktorData = a; // spara referens för filtrering
+      marker.addTo(categoryLayers[a.kategori]);
+    });
+
+    // Lista kategorier med kryssrutor
+    const container = document.getElementById('category-list');
+    Object.keys(categoryLayers).forEach(cat => {
+      const div = document.createElement('div');
+      div.className = 'category';
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.id = cat;
+      checkbox.addEventListener('change', e => updateMapAndList());
+      const label = document.createElement('label');
+      label.htmlFor = cat;
+      label.innerText = cat;
+      div.appendChild(checkbox);
+      div.appendChild(label);
+      container.appendChild(div);
+    });
+
+    // Skapa ort-filter
+    const ortFilter = document.getElementById('ort-filter');
+    const orter = [...new Set(aktorer.map(a => a.ort).filter(o => o))].sort();
+    orter.forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o;
+      opt.innerText = o;
+      ortFilter.appendChild(opt);
+    });
+    ortFilter.addEventListener('change', updateMapAndList);
+
+    const listContainer = document.getElementById('aktor-list');
+
+    function updateMapAndList() {
+      // Ta bort alla lager
+      Object.values(categoryLayers).forEach(layer => layer.remove());
+
+      // Bestäm valda kategorier
+      const selectedCategories = Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.id);
+      const selectedOrt = ortFilter.value;
+
+      listContainer.innerHTML = '';
+
+      aktorer.forEach(a => {
+        const show = selectedCategories.includes(a.kategori) && (!selectedOrt || a.ort === selectedOrt);
+        if(show) {
+          // Lägg till i lista
+          const div = document.createElement('div');
+          div.className = 'aktor';
+          div.innerText = `${a.namn} (${a.ort})`;
+          listContainer.appendChild(div);
+          // Lägg till på karta
+          const marker = L.marker(a.coords).bindPopup(`<b>${a.namn}</b><br>${a.ort}`);
+          marker.addTo(categoryLayers[a.kategori]);
+        }
+      });
+
+      // Lägg till valda lager på kartan
+      selectedCategories.forEach(cat => categoryLayers[cat].addTo(map));
+    }
+
+  </script>
+</body>
+</html>
