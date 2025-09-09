@@ -7,14 +7,35 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
   <style>
-    body { margin:0; padding:0; }
-    #map { width: 100%; height: 100vh; }
+    html, body { height: 100%; margin: 0; }
+    #map { width: 100%; height: 100%; }
+
+    /* Filter-container */
+    .filter-container {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(255,255,255,0.95);
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      font-family: sans-serif;
+    }
+    .filter-container select {
+      margin-bottom: 5px;
+      width: 200px;
+      padding: 3px;
+    }
+
+    /* Legend */
     .legend {
       background: white; 
       padding: 10px; 
       line-height: 1.5em;
-      border-radius: 5px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      border-radius: 6px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+      font-family: sans-serif;
     }
     .legend span {
       display: inline-block;
@@ -23,28 +44,28 @@
       margin-right: 5px;
       vertical-align: middle;
     }
-    .filter-container {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-      background: white;
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    }
   </style>
 </head>
 <body>
   <div class="filter-container">
-    <label for="categoryFilter">Filtrera kategori:</label>
-    <select id="categoryFilter">
+    <label for="categorySelect"><b>Kategori:</b></label><br>
+    <select id="categorySelect">
       <option value="alla">Alla</option>
       <option value="naringsliv">Näringsliv</option>
       <option value="offentlig">Offentlig sektor</option>
       <option value="utbildning">Universitet/forskning</option>
       <option value="finansiering">Gränsöverskridande samarbeten & finansiering</option>
       <option value="kultur">Kultur & sport</option>
+    </select><br>
+
+    <label for="regionSelect"><b>Region:</b></label><br>
+    <select id="regionSelect">
+      <option value="alla">Alla</option>
+    </select><br>
+
+    <label for="actorSelect"><b>Aktör:</b></label><br>
+    <select id="actorSelect">
+      <option value="alla">Alla</option>
     </select>
   </div>
 
@@ -54,14 +75,14 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script>
     // Initiera kartan
-    var map = L.map('map').setView([63.0, 12.5], 6); // Mittpunkt Jämtland/Trøndelag
+    var map = L.map('map').setView([63.0, 12.5], 6);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Ikoner för olika kategorier
+    // Ikoner per kategori
     var icons = {
       naringsliv: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/business.png', iconSize:[30,30]}),
       offentlig: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/government.png', iconSize:[30,30]}),
@@ -70,7 +91,6 @@
       kultur: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/theatre-mask.png', iconSize:[30,30]})
     };
 
-    // Färgkod för legend
     var colors = {
       naringsliv: "red",
       offentlig: "blue",
@@ -79,43 +99,90 @@
       kultur: "orange"
     };
 
-    // Exempel på aktörer, fyll på med dina egna
+    // Aktörer: fyll på med dina egna
     var actors = [
-      {name:"Företag A", category:"naringsliv", coords:[63.17, 14.63], link:"https://example.com"},
-      {name:"Kommun B", category:"offentlig", coords:[63.43, 10.40], link:"https://example.com"},
-      {name:"Universitet C", category:"utbildning", coords:[63.43, 10.40], link:"https://example.com"},
-      {name:"Fond D", category:"finansiering", coords:[63.78, 11.30], link:"https://example.com"},
-      {name:"Kultur E", category:"kultur", coords:[62.47, 11.33], link:"https://example.com"}
+      {name:"Företag A", category:"naringsliv", region:"Jämtland", coords:[63.17, 14.63], link:"https://example.com"},
+      {name:"Kommun B", category:"offentlig", region:"Jämtland", coords:[63.43, 10.40], link:"https://example.com"},
+      {name:"Universitet C", category:"utbildning", region:"Trøndelag", coords:[63.43, 10.40], link:"https://example.com"},
+      {name:"Fond D", category:"finansiering", region:"Trøndelag", coords:[63.78, 11.30], link:"https://example.com"},
+      {name:"Kultur E", category:"kultur", region:"Jämtland", coords:[62.47, 11.33], link:"https://example.com"}
     ];
 
+    // Marker cluster
     var markers = L.markerClusterGroup();
+    var markerList = [];
 
-    actors.forEach(actor => {
-      var marker = L.marker(actor.coords, {icon: icons[actor.category]});
-      marker.bindPopup(`<b>${actor.name}</b><br>Kategori: ${actor.category}<br><a href="${actor.link}" target="_blank">Webb</a>`);
-      marker.actorCategory = actor.category; // för filtrering
-      markers.addLayer(marker);
-    });
-
-    map.addLayer(markers);
-
-    // Filter
-    document.getElementById("categoryFilter").addEventListener("change", function(){
-      var selected = this.value;
+    function addMarkers(filterCategory, filterRegion, filterActor) {
       markers.clearLayers();
+      markerList = [];
       actors.forEach(actor => {
-        if(selected === "alla" || actor.category === selected){
+        if ((filterCategory==="alla" || actor.category===filterCategory) &&
+            (filterRegion==="alla" || actor.region===filterRegion) &&
+            (filterActor==="alla" || actor.name===filterActor)) {
+
           var marker = L.marker(actor.coords, {icon: icons[actor.category]});
-          marker.bindPopup(`<b>${actor.name}</b><br>Kategori: ${actor.category}<br><a href="${actor.link}" target="_blank">Webb</a>`);
+          marker.bindPopup(`<b>${actor.name}</b><br>Kategori: ${actor.category}<br>Region: ${actor.region}<br><a href="${actor.link}" target="_blank">Webb</a>`);
+
+          // Hover-effekt
+          marker.on('mouseover', function() { this.openPopup(); });
+          marker.on('mouseout', function() { this.closePopup(); });
+
           markers.addLayer(marker);
+          markerList.push(marker);
         }
       });
+      map.addLayer(markers);
+    }
+
+    addMarkers("alla","alla","alla");
+
+    // Dynamisk region och aktör dropdown
+    function updateDropdowns() {
+      var category = document.getElementById("categorySelect").value;
+      
+      // Region dropdown
+      var regionSelect = document.getElementById("regionSelect");
+      var regions = [...new Set(actors.filter(a=>category==="alla"||a.category===category).map(a=>a.region))];
+      regionSelect.innerHTML = '<option value="alla">Alla</option>';
+      regions.forEach(r => { regionSelect.innerHTML += `<option value="${r}">${r}</option>` });
+
+      // Aktör dropdown
+      var actorSelect = document.getElementById("actorSelect");
+      var filteredActors = actors.filter(a=>
+        (category==="alla" || a.category===category) &&
+        (regionSelect.value==="alla" || a.region===regionSelect.value));
+      actorSelect.innerHTML = '<option value="alla">Alla</option>';
+      filteredActors.forEach(a => { actorSelect.innerHTML += `<option value="${a.name}">${a.name}</option>` });
+    }
+
+    document.getElementById("categorySelect").addEventListener("change", function(){
+      updateDropdowns();
+      addMarkers(this.value,"alla","alla");
+    });
+
+    document.getElementById("regionSelect").addEventListener("change", function(){
+      var category = document.getElementById("categorySelect").value;
+      updateDropdowns();
+      addMarkers(category,this.value,"alla");
+    });
+
+    document.getElementById("actorSelect").addEventListener("change", function(){
+      var category = document.getElementById("categorySelect").value;
+      var region = document.getElementById("regionSelect").value;
+      addMarkers(category, region, this.value);
+      if(this.value!=="alla"){
+        var selectedMarker = markerList.find(m=>m.getPopup().getContent().includes(this.value));
+        if(selectedMarker){
+          map.setView(selectedMarker.getLatLng(), 10);
+          selectedMarker.openPopup();
+        }
+      }
     });
 
     // Legend
     var legend = L.control({position: 'bottomright'});
     legend.onAdd = function(map){
-      var div = L.DomUtil.create('div', 'legend');
+      var div = L.DomUtil.create('div','legend');
       div.innerHTML = "<h4>Kategorier</h4>";
       for(var key in colors){
         div.innerHTML += `<span style="background:${colors[key]}"></span>${key}<br>`;
