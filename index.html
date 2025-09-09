@@ -1,226 +1,98 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verksamheter i Jämtland Härjedalen och Trøndelag</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
-    h1 { text-align: center; }
-    ul { list-style: none; padding-left: 0; }
-    li { margin: 5px 0; }
-    a { text-decoration: none; color: inherit; }
-    .red { color: #c0392b; }
-    .blue { color: #2980b9; }
-    .yellow { color: #f39c12; }
-    .green { color: #27ae60; }
-    .orange { color: #d35400; }
-    .category { font-weight: bold; margin-top: 15px; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Aktörskarta – Fellesrådet för Trøndelag och Jämtland Härjedalen</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-sA+g9kL7oE2rJGV+6FvTmxCz9A+k5VtZoG5uUo7pV+0="
+          crossorigin=""/>
+    <style>
+        #map { height: 90vh; width: 100%; }
+        body { font-family: Arial, sans-serif; margin:0; padding:0; }
+        h1 { text-align:center; margin: 10px 0; }
+        #dropdown { margin: 10px; width: 100%; max-width: 400px; display:block; margin-left:auto; margin-right:auto; }
+    </style>
 </head>
 <body>
-  <h1>Verksamheter i Jämtland Härjedalen och Trøndelag</h1>
-  <ul>
-    <!-- Röd: Näringsliv och företag -->
-    <li class="red category">Enskilda företag/bedrifter</li>
-      <li class="red"><a href="#">Aneo (Trondheim)</a></li>
-      <li class="red"><a href="#">Meråker Kurbad (Meråker)</a></li>
-      <li class="red"><a href="#">Persson Invest (Östersund)</a></li>
-      <li class="red"><a href="#">Ritek (Levanger)</a></li>
-      <li class="red"><a href="#">Uniper (Östersund)</a></li>
+<h1>Aktörskarta – Fellesrådet för Trøndelag och Jämtland Härjedalen</h1>
+<select id="dropdown">
+    <option value="">-- Välj aktör --</option>
+</select>
+<div id="map"></div>
 
-    <li class="red category">Näringslivsorganisationer - Jämtland Härjedalen</li>
-      <li class="red"><a href="#">Företagarna (Östersund)</a></li>
-      <li class="red"><a href="#">Handelskammaren Mitt (Östersund)</a></li>
-      <li class="red"><a href="#">IUC Jämtland Härjedalen (Östersund)</a></li>
-      <li class="red"><a href="#">Jämtland Härjedalen Turism (JHT) (Östersund)</a></li>
-      <li class="red"><a href="#">Lantbrukarnas riksorganisation (LRF) (Östersund)</a></li>
-      <li class="red"><a href="#">Nyföretagarcentrum (Östersund)</a></li>
-      <li class="red"><a href="#">Peak Inkubator (Östersund)</a></li>
-      <li class="red"><a href="#">Samling Näringsliv (Östersund)</a></li>
-      <li class="red"><a href="#">Svenskt Näringsliv Jämtland (Östersund)</a></li>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-o9N1j7kN4Rj2bVxhR3Q1rGGWjZy3A0cI+4jYwDz3Zj4="
+        crossorigin=""></script>
+<script>
+    const map = L.map('map').setView([63.0, 12.5], 6);
 
-    <li class="red category">Näringslivsorganisationer - Trøndelag</li>
-      <li class="red"><a href="#">Blått Kompetansesenter AS (Trondheim)</a></li>
-      <li class="red"><a href="#">FI Næringshage (Steinkjer)</a></li>
-      <li class="red"><a href="#">Fremtidens Industri AS (FI) (Trondheim)</a></li>
-      <li class="red"><a href="#">Industrinavet i Trøndelag (Trondheim)</a></li>
-      <li class="red"><a href="#">INAM AS (Innovasjon Namdal) (Namsos)</a></li>
-      <li class="red"><a href="#">Naeringsforeningen i Vaernesregionen (Stjørdal)</a></li>
-      <li class="red"><a href="#">Nasjonalparken Næringshage (Røros)</a></li>
-      <li class="red"><a href="#">Næringshagen Hitra og Frøya (Hitra)</a></li>
-      <li class="red"><a href="#">Næringsforeningen i Trondheimsregionen (NiT) (Trondheim)</a></li>
-      <li class="red"><a href="#">NHO Næringslivets Hovedorganisasjon (Trondheim)</a></li>
-      <li class="red"><a href="#">Proneo (Steinkjer)</a></li>
-      <li class="red"><a href="#">Rørosregionen Næringshage (Røros)</a></li>
-      <li class="red"><a href="#">RENERGY – Renewable Energy Cluster (Trondheim)</a></li>
-      <li class="red"><a href="#">Thams Innovasjon AS (Trondheim)</a></li>
-      <li class="red"><a href="#">Tindved Kulturhage (Steinkjer)</a></li>
-      <li class="red"><a href="#">Trøndelag Reiseliv (Trondheim)</a></li>
-      <li class="red"><a href="#">WoodWorks! Cluster (Trondheim)</a></li>
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-    <!-- Blå: Offentliga aktörer -->
-    <li class="blue category">Offentliga aktörer - Jämtland Härjedalen</li>
-      <li class="blue"><a href="#">Almi (Östersund)</a></li>
-      <li class="blue"><a href="#">Arbetsförmedlingen (Östersund)</a></li>
-      <li class="blue"><a href="#">Försäkringskassan (Östersund)</a></li>
-      <li class="blue"><a href="#">Kommunförbundet JH (Östersund)</a></li>
-      <li class="blue"><a href="#">Länsstyrelsen (Östersund)</a></li>
-      <li class="blue"><a href="#">Polisen (Östersund)</a></li>
-      <li class="blue"><a href="#">Sametinget (Östersund)</a></li>
-      <li class="blue"><a href="#">Samverket/Myndighetsnätverket (Östersund)</a></li>
-      <li class="blue"><a href="#">Skatteverket (Östersund)</a></li>
-      <li class="blue"><a href="#">Tullverket (Östersund)</a></li>
+    // Lista över aktörer
+    const actors = [
+        {name:"Almi", category:"Offentliga aktörer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"blue"},
+        {name:"Arbetsförmedlingen", category:"Offentliga aktörer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"blue"},
+        {name:"Blått Kompetansesenter AS", category:"Näringslivsorganisationer - Trøndelag", lat:63.44683, lon:10.42191, color:"red"},
+        {name:"BNI City Östersund", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.17917, lon:14.63583, color:"green"},
+        {name:"Bærekraftsnettverket i Trøndelag", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.44683, lon:10.42191, color:"green"},
+        {name:"Business Region MidSweden", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.17917, lon:14.63583, color:"green"},
+        {name:"Connect Midt Norge", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.44683, lon:10.42191, color:"green"},
+        {name:"Digs Incubator Trondheim", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.44683, lon:10.42191, color:"green"},
+        {name:"Driv Innovation", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.17917, lon:14.63583, color:"green"},
+        {name:"E14 Invest", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.4167, lon:13.0833, color:"green"},
+        {name:"Falstadsenteret", category:"Universitet, utbildnings och forskningsmiljöer - Trøndelag", lat:63.6500, lon:11.2833, color:"yellow"},
+        {name:"Föreningen Norden i Östersund", category:"Gränsöverskridande samarbeten regionalt", lat:63.17917, lon:14.63583, color:"green"},
+        {name:"Föreningen Norden i Trondheim", category:"Gränsöverskridande samarbeten regionalt", lat:63.44683, lon:10.42191, color:"green"},
+        {name:"Gaaltije", category:"Civilsamhället kultur - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"orange"},
+        {name:"Handelskammaren Mitt", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
+        {name:"Hushållningssällskapet", category:"Universitet, utbildnings och forskningsmiljöer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"yellow"},
+        {name:"IUC Jämtland Härjedalen", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
+        {name:"Jämtland Härjedalen Turism (JHT)", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
+        {name:"Kul Tur", category:"Kulturevent - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"orange"},
+        {name:"Mittuniversitetet (MIUN)", category:"Universitet, utbildnings och forskningsmiljöer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"yellow"},
+        {name:"Naeringsforeningen i Vaernesregionen", category:"Näringslivsorganisationer - Trøndelag", lat:63.4669, lon:11.1863, color:"red"},
+        {name:"NHO Næringslivets Hovedorganisasjon", category:"Näringslivsorganisationer - Trøndelag", lat:63.44683, lon:10.42191, color:"red"},
+        {name:"NTNU:s Næringslivsringer", category:"Universitet, utbildnings och forskningsmiljöer - Trøndelag", lat:63.44683, lon:10.42191, color:"yellow"},
+        {name:"Norwegian University of Science and Technology NTNU", category:"Universitet, utbildnings och forskningsmiljöer - Trøndelag", lat:63.44683, lon:10.42191, color:"yellow"},
+        {name:"Nyföretagarcentrum", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
+        {name:"Platform North", category:"Gränsöverskridande samarbeten regionalt", lat:63.17917, lon:14.63583, color:"green"},
+        {name:"Peak Inkubator", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
+        {name:"Polisen", category:"Offentliga aktörer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"blue"},
+        {name:"Rørosregionen Næringshage", category:"Näringslivsorganisationer - Trøndelag", lat:62.5747, lon:11.3842, color:"red"},
+        {name:"Svenskt Näringsliv Jämtland", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
+        {name:"Sametinget", category:"Offentliga aktörer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"blue"},
+        {name:"Statsforvalteren", category:"Offentliga aktörer - Trøndelag", lat:63.44683, lon:10.42191, color:"blue"},
+        {name:"Trøndelag Reiseliv", category:"Näringslivsorganisationer - Trøndelag", lat:63.44683, lon:10.42191, color:"red"},
+        {name:"Trondheim Tech Port", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.44683, lon:10.42191, color:"green"},
+        {name:"Uniper", category:"Enskilda företag/bedrifter", lat:63.17917, lon:14.63583, color:"red"}, // kan tas bort om du vill
+    ];
 
-    <li class="blue category">Offentliga aktörer - Trøndelag</li>
-      <li class="blue"><a href="#">Försvarskoordinatorn Trøndelag (Trondheim)</a></li>
-      <li class="blue"><a href="#">Helse Midt-Norge RHF (Steinkjer)</a></li>
-      <li class="blue"><a href="#">Kommunförbundet Trøndelag (Trondheim)</a></li>
-      <li class="blue"><a href="#">NAV (Trondheim)</a></li>
-      <li class="blue"><a href="#">Politi (Trondheim)</a></li>
-      <li class="blue"><a href="#">Skatteetaten (Trondheim)</a></li>
-      <li class="blue"><a href="#">Statsforvalteren (Trondheim)</a></li>
-      <li class="blue"><a href="#">Statens vägvesende (Trondheim)</a></li>
-      <li class="blue"><a href="#">Tolletaten (Trondheim)</a></li>
+    // Lägg till markörer
+    actors.forEach(actor => {
+        const marker = L.circleMarker([actor.lat, actor.lon], {
+            radius: 8,
+            color: actor.color,
+            fillOpacity: 0.8
+        }).addTo(map);
+        marker.bindPopup(`<b>${actor.name}</b><br>${actor.category}`);
 
-    <!-- Gul: Universitet, utbildning och forskning -->
-    <li class="yellow category">Universitet, utbildnings och forskningsmiljöer - Jämtland Härjedalen</li>
-      <li class="yellow"><a href="#">Hushållningssällskapet (Östersund)</a></li>
-      <li class="yellow"><a href="#">Mittuniversitetet (MIUN) (Östersund)</a></li>
-      <li class="yellow"><a href="#">Torsta AB (Torsta)</a></li>
+        // Lägg till i drop-down
+        const option = document.createElement("option");
+        option.value = `${actor.lat},${actor.lon}`;
+        option.text = actor.name;
+        document.getElementById("dropdown").appendChild(option);
+    });
 
-    <li class="yellow category">Universitet, utbildnings och forskningsmiljöer - Trøndelag</li>
-      <li class="yellow"><a href="#">Dronning Mauds Minne Høgskole DMMH (Trondheim)</a></li>
-      <li class="yellow"><a href="#">Nord universitet (Campus Levanger, Steinkjer och Namsos) (Levanger)</a></li>
-      <li class="yellow"><a href="#">Norwegian University of Science and Technology NTNU (Trondheim)</a></li>
-      <li class="yellow"><a href="#">NTNU:s Næringslivsringer (Trondheim)</a></li>
-      <li class="yellow"><a href="#">Sintef (Trondheim)</a></li>
-      <li class="yellow"><a href="#">Falstadsenteret (Ekne)</a></li>
-
-    <!-- Grön: Gränsöverskridande samarbeten, finansiering och nätverk -->
-    <li class="green category">Finansiering</li>
-      <li class="green"><a href="#">ESF-rådet Mellersta Norrland (Gävle)</a></li>
-      <li class="green"><a href="#">Innovation Norge (Trondheim)</a></li>
-      <li class="green"><a href="#">Interreg Aurora (Luleå)</a></li>
-      <li class="green"><a href="#">Interreg Sverige Norge Nordens gröna bälte (Östersund)</a></li>
-      <li class="green"><a href="#">Leader 3Sam (Hammarstrand)</a></li>
-      <li class="green"><a href="#">Leader Grogrund (Brunflo)</a></li>
-      <li class="green"><a href="#">Leader Mittland Plus (Sundsvall)</a></li>
-      <li class="green"><a href="#">Region JH (Östersund)</a></li>
-      <li class="green"><a href="#">Tillväxtverket (Trondheim)</a></li>
-      <li class="green"><a href="#">Trøndelag fylkeskommune (Östersund)</a></li>
-
-    <li class="green category">Gränsöverskridande samarbeten regionalt</li>
-      <li class="green"><a href="#">Atlantbanan (Trondheim)</a></li>
-      <li class="green"><a href="#">Föreningen Norden i Östersund (Östersund)</a></li>
-      <li class="green"><a href="#">Föreningen Norden i Trondheim (Trondheim)</a></li>
-      <li class="green"><a href="#">Gränsräddningsrådet Nordred (Stockholm)</a></li>
-      <li class="green"><a href="#">Platform North (Östersund)</a></li>
-      <li class="green"><a href="#">Samarbete mellan polisen (Vauldalen)</a></li>
-      <li class="green"><a href="#">Tullsamarbete (Storlien och Vauldalen) (Storlien)</a></li>
-
-    <li class="green category">Gränsöverskridande samarbeten Norge - Sverige</li>
-      <li class="green"><a href="#">Business Sweden (Stockholm)</a></li>
-      <li class="green"><a href="#">Grensetjänsten (Morokulien)</a></li>
-      <li class="green"><a href="#">Norska ambassaden i Stockholm (Stockholm)</a></li>
-      <li class="green"><a href="#">Norsksvenska handelskammaren (Oslo)</a></li>
-      <li class="green"><a href="#">Svenska ambassaden i Oslo (Oslo)</a></li>
-      <li class="green"><a href="#">Sveriges generalkonsul i Trondheim (Trondheim)</a></li>
-
-    <li class="green category">Europeiska och nordiska samarbeten</li>
-      <li class="green"><a href="#">Europaforum Norra Sverige (EFNS) (Östersund)</a></li>
-      <li class="green"><a href="#">Nordiska ministerrådet (Köpenhamn)</a></li>
-      <li class="green"><a href="#">Nordiska rådet (Köpenhamn)</a></li>
-      <li class="green"><a href="#">North Sweden European Office (Bryssel)</a></li>
-      <li class="green"><a href="#">Northern Sparsely Populated Areas-nätverket (NSPA) (Bryssel)</a></li>
-      <li class="green"><a href="#">Trøndelag Europakontor (Bryssel)</a></li>
-
-    <li class="green category">Nordens gränskommittéer</li>
-      <li class="green"><a href="#">ARKO-samarbetet (Kongsvinger)</a></li>
-      <li class="green"><a href="#">Bothnian Arc (Bottenviksbågen) (Haparanda)</a></li>
-      <li class="green"><a href="#">Gränskommittén Innlandet-Dalarna (Falun)</a></li>
-      <li class="green"><a href="#">Grensekomiteen Värmland-Østfold (Askim)</a></li>
-      <li class="green"><a href="#">Greater Copenhagen (tidigare Öresundskommittén) (Köpenhamn)</a></li>
-      <li class="green"><a href="#">Kvarkenrådet (Umeå)</a></li>
-      <li class="green"><a href="#">Midtskandia (Tärnaby)</a></li>
-      <li class="green"><a href="#">Nordkalottrådet (Luleå)</a></li>
-      <li class="green"><a href="#">Nordiska Skärgårdssamarbetet (Nagu)</a></li>
-      <li class="green"><a href="#">Svinesundskommittén (Strömstad)</a></li>
-      <li class="green"><a href="#">Tornedalsrådet/Tornionlaakson neuvosto (Haparanda)</a></li>
-
-    <!-- Orange: Kultur och sport -->
-    <li class="orange category">Civilsamhället kultur - Jämtland Härjedalen</li>
-      <li class="orange"><a href="#">Föreningsarkivet i Jämtlands län (Östersund)</a></li>
-      <li class="orange"><a href="#">Gaaltije (Östersund)</a></li>
-      <li class="orange"><a href="#">Heimbygda (Östersund)</a></li>
-      <li class="orange"><a href="#">Jamtli (Östersund)</a></li>
-      <li class="orange"><a href="#">Kultur i Jämtland Härjedalen (Östersund)</a></li>
-      <li class="orange"><a href="#">RF-SISU Jämtland-Härjedalen (Östersund)</a></li>
-      <li class="orange"><a href="#">Saemien Sijte (Snåsa)</a></li>
-      <li class="orange"><a href="#">SPF Seniorerna Jämtland-Härjedalen (Östersund)</a></li>
-
-    <li class="orange category">Civilsamhället kultur - Trøndelag</li>
-      <li class="orange"><a href="#">Rockheim (Trondheim)</a></li>
-      <li class="orange"><a href="#">Stiklestad Nasjonale Kultursenter (Stiklestad)</a></li>
-      <li class="orange"><a href="#">Stiftinga Hilmar Alexandersen (Steinkjer)</a></li>
-      <li class="orange"><a href="#">Trøndelag Kulturkrets (Trondheim)</a></li>
-      <li class="orange"><a href="#">Kulturkontakt Trondheim (Trondheim)</a></li>
-      <li class="orange"><a href="#">Trøndelag Teater (Trondheim)</a></li>
-
-    <li class="orange category">Kulturevent - Jämtland Härjedalen</li>
-      <li class="orange"><a href="#">Åre Sessions (Åre)</a></li>
-      <li class="orange"><a href="#">Funäs Festival (Funäsdalen)</a></li>
-      <li class="orange"><a href="#">Härdalsyran & Härdalsveckan (Härdal)</a></li>
-      <li class="orange"><a href="#">Jamtli Julmarknad (Östersund)</a></li>
-      <li class="orange"><a href="#">Jamtli Vårmarknad (Östersund)</a></li>
-      <li class="orange"><a href="#">Kul Tur (Östersund)</a></li>
-      <li class="orange"><a href="#">Musikkväll på Kalfjäll (Åre)</a></li>
-      <li class="orange"><a href="#">Musikkväll vid Åresjön (Åre)</a></li>
-      <li class="orange"><a href="#">Västgård Game Fair (Åre)</a></li>
-      <li class="orange"><a href="#">Åre Höstmarknad (Åre)</a></li>
-
-    <li class="orange category">Kulturevent - Trøndelag</li>
-      <li class="orange"><a href="#">Basta – Litteraturhuset i Trondheim (Trondheim)</a></li>
-      <li class="orange"><a href="#">Elden (Røros)</a></li>
-      <li class="orange"><a href="#">Jazzfest (Trondheim)</a></li>
-      <li class="orange"><a href="#">Kortreist Dansefestival (Trondheim)</a></li>
-      <li class="orange"><a href="#">NEON Festivalen (Trondheim)</a></li>
-      <li class="orange"><a href="#">Olavsfest (Trondheim)</a></li>
-      <li class="orange"><a href="#">Pstereo (Trondheim)</a></li>
-      <li class="orange"><a href="#">Rørosmartnan (Røros)</a></li>
-      <li class="orange"><a href="#">Storsjöyran (Östersund)</a></li>
-      <li class="orange"><a href="#">Trondheim Rocks (Trondheim)</a></li>
-      <li class="orange"><a href="#">Trøndersk Matfestival (Trondheim)</a></li>
-      <li class="orange"><a href="#">Steinkjerfestivalen (Steinkjer)</a></li>
-      <li class="orange"><a href="#">Festningen (Trondheim)</a></li>
-      <li class="orange"><a href="#">Stiklestadspelet – Spelet om Heilag Olav (Stiklestad)</a></li>
-
-    <li class="orange category">Sportevent - Jämtland Härjedalen</li>
-      <li class="orange"><a href="#">Bruksvallsloppet (Bruksvallarna)</a></li>
-      <li class="orange"><a href="#">Damernas/Herrarnas alpina världscup (Åre)</a></li>
-      <li class="orange"><a href="#">Fjällmaratonveckan (Åre)</a></li>
-      <li class="orange"><a href="#">Fjälltopploppet (Åre)</a></li>
-      <li class="orange"><a href="#">Red Bull GIBAWAY (Åre)</a></li>
-      <li class="orange"><a href="#">Skistar Winter Games (ungdom) (Åre)</a></li>
-      <li class="orange"><a href="#">St Olavsloppet (Östersund)</a></li>
-      <li class="orange"><a href="#">Storsjöcupen (Östersund)</a></li>
-      <li class="orange"><a href="#">Vårruset (Östersund)</a></li>
-      <li class="orange"><a href="#">Åre Bike Festival (Åre)</a></li>
-      <li class="orange"><a href="#">Vemdalsslalom (ungdom) (Vemdalen)</a></li>
-
-    <li class="orange category">Sportevent - Trøndelag</li>
-      <li class="orange"><a href="#">Birkebeiner-rennet på Røros/Trøndelag (Røros)</a></li>
-      <li class="orange"><a href="#">Erik Håker Cup (Trondheim)</a></li>
-      <li class="orange"><a href="#">Knykenlekene (barn- och ungdomsfestival) (Orkdal)</a></li>
-      <li class="orange"><a href="#">Leangen Travbanes stora travhelger (Trondheim)</a></li>
-      <li class="orange"><a href="#">Lånkebanen Rallycross (NM och internationella tävlingar) (Lånke)</a></li>
-      <li class="orange"><a href="#">Meråkerrennet (Meråker)</a></li>
-      <li class="orange"><a href="#">Norgescup Skiskyting (Trondheim)</a></li>
-      <li class="orange"><a href="#">Skandia Cup (fotbollsturnering för barn & ungdom) (Trondheim)</a></li>
-      <li class="orange"><a href="#">Trondheimslekene (Trondheim)</a></li>
-      <li class="orange"><a href="#">Rennebumartnan Skisprint (del av lokal skidhelg) (Rennebu)</a></li>
-      <li class="orange"><a href="#">Julecup i Håndball (Trondheim)</a></li>
-      <li class="orange"><a href="#">Trondheim Maraton (Trondheim)</a></li>
-  </ul>
+    // Zooma till vald aktör
+    document.getElementById("dropdown").addEventListener("change", function() {
+        if(this.value){
+            const coords = this.value.split(",");
+            map.setView([parseFloat(coords[0]), parseFloat(coords[1])], 10);
+        }
+    });
+</script>
 </body>
 </html>
