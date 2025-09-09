@@ -1,116 +1,180 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <title>Aktörskarta Tröndelag & Jämtland Härjedalen</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    body { margin:0; font-family:sans-serif; display:flex; height:100vh; }
-    #sidebar { width:30%; overflow-y:auto; padding:10px; background:#f5f5f5; }
-    #map { flex:1; }
-    h2 { margin:10px 0; }
-    .category, .aktor { margin:5px 0; }
-    select { width:100%; }
-    .legend { background:white; padding:5px; line-height:1.4; }
-    .legend-color-box { width:18px; height:18px; display:inline-block; margin-right:5px; vertical-align:middle; }
-  </style>
+<meta charset="utf-8">
+<title>Aktörskarta Jämtland Härjedalen & Trøndelag</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  body { margin:0; font-family: Arial, sans-serif; }
+  #map { width: 100%; height: 70vh; }
+  #filters { padding:10px; background:#f2f2f2; }
+  select { margin-right: 10px; }
+  ul { list-style:none; padding-left:0; max-height:250px; overflow-y:auto; }
+  li { margin-bottom:4px; }
+  .legend { background:white; padding:6px; line-height:18px; color:#555; border-radius:5px; }
+  .legend span { display:inline-block; width:12px; height:12px; margin-right:6px; }
+</style>
 </head>
 <body>
-  <div id="sidebar">
-    <h2>Kategorier</h2>
-    <div id="category-list"></div>
-    <h2>Filter på ort</h2>
-    <select id="ort-filter"><option value="">Alla orter</option></select>
-    <h2>Aktörer</h2>
-    <div id="aktor-list"></div>
-  </div>
-  <div id="map"></div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script>
-    // GeoJSON för Jämtland/Härjedalen och Trøndelag (förenklade)
-    const geoJamtland = {
-      "type":"Feature", "properties":{}, "geometry":{
-        "type":"Polygon", "coordinates":[[
-          [14.0,62.2],[14.0,64.0],[15.0,64.0],[15.0,62.2],[14.0,62.2]
-        ]]
-      }
-    };
-    const geoTrondelag = {
-      "type":"Feature", "properties":{}, "geometry":{
-        "type":"Polygon", "coordinates":[[
-          [9.0,63.0],[9.0,64.5],[11.0,64.5],[11.0,63.0],[9.0,63.0]
-        ]]
-      }
-    };
+<h1>Aktörskarta Jämtland Härjedalen & Trøndelag</h1>
 
-    // Data: kategori, namn, ort, coords
-    const aktorer = [
-      {kategori:"Näringslivsorganisationer - Jämtland Härjedalen",namn:"Samling Näringsliv",ort:"Östersund",coords:[63.1792,14.6357]},
-      {kategori:"Offentliga aktörer - Jämtland Härjedalen",namn:"Polisen",ort:"Östersund",coords:[63.1792,14.6357]},
-      {kategori:"Näringslivsorganisationer - Tröndelag",namn:"NHO Næringslivets Hovedorganisasjon",ort:"Trondheim",coords:[63.4305,10.3951]},
-      {kategori:"Offentliga aktörer - Tröndelag",namn:"Statsforvalteren",ort:"Trondheim",coords:[63.4305,10.3951]},
-      // Fyll på här med resten av aktörerna från din lista...
-    ];
+<div id="filters">
+  Kategori:
+  <select id="categoryFilter">
+    <option value="all">Alla</option>
+    <option value="Näringsliv">Näringsliv</option>
+    <option value="Offentlig sektor">Offentlig sektor</option>
+    <option value="Universitet/Forskning">Universitet/Forskning</option>
+    <option value="Kultur">Kultur</option>
+    <option value="Sport">Sport</option>
+    <option value="Finansiering">Finansiering</option>
+    <option value="Gränsöverskridande">Gränsöverskridande</option>
+    <option value="Nätverk">Nätverk</option>
+    <option value="Enskilda företag">Enskilda företag</option>
+  </select>
 
-    const map = L.map('map').setView([63.5, 12.0], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:18, attribution:'© OpenStreetMap' }).addTo(map);
+  Ort:
+  <select id="cityFilter">
+    <option value="all">Alla</option>
+    <option value="Östersund">Östersund</option>
+    <option value="Åre">Åre</option>
+    <option value="Trondheim">Trondheim</option>
+    <option value="Steinkjer">Steinkjer</option>
+    <option value="Røros">Røros</option>
+    <option value="Stjørdal">Stjørdal</option>
+    <option value="Meråker">Meråker</option>
+    <option value="Levanger">Levanger</option>
+    <option value="Härjedalen">Härjedalen</option>
+    <option value="Hammerdal">Hammerdal</option>
+    <option value="Brunflo">Brunflo</option>
+    <option value="Hammarstrand">Hammarstrand</option>
+    <option value="Torsta">Torsta</option>
+    <option value="Ekne">Ekne</option>
+    <option value="Hell">Hell</option>
+    <option value="Verdal">Verdal</option>
+    <option value="Tänndalen">Tänndalen</option>
+    <option value="Snåsa">Snåsa</option>
+  </select>
+</div>
 
-    // Lägg till gränspolygoner
-    L.geoJSON(geoJamtland, {style:{color:'#0055A4',weight:3,fillColor:'#0055A4',fillOpacity:0.1}}).addTo(map);
-    L.geoJSON(geoTrondelag, {style:{color:'#3C763D',weight:3,fillColor:'#3C763D',fillOpacity:0.1}}).addTo(map);
+<div id="map"></div>
 
-    // Legend
-    const legend = L.control({position:'topright'});
-    legend.onAdd = function(){
-      const div = L.DomUtil.create('div','legend');
-      div.innerHTML = '<div><span class="legend-color-box" style="background:#0055A4;"></span>Jämtland/Härjedalen</div>'
-                    + '<div><span class="legend-color-box" style="background:#3C763D;"></span>Trøndelag</div>';
-      return div;
-    };
-    legend.addTo(map);
+<h2>Aktörlista</h2>
+<ul id="actorList"></ul>
 
-    const categoryLayers = {};
-    aktorer.forEach(a => {
-      if(!categoryLayers[a.kategori]) categoryLayers[a.kategori] = L.layerGroup();
-      const marker = L.marker(a.coords).bindPopup(`<b>${a.namn}</b><br>${a.ort}`);
-      marker.addTo(categoryLayers[a.kategori]);
-    });
+<div class="legend" id="legend">
+  <b>Färg per kategori:</b><br>
+  <span style="background:red"></span>Näringsliv<br>
+  <span style="background:blue"></span>Offentlig sektor<br>
+  <span style="background:green"></span>Universitet/Forskning<br>
+  <span style="background:orange"></span>Kultur<br>
+  <span style="background:purple"></span>Sport<br>
+  <span style="background:brown"></span>Finansiering<br>
+  <span style="background:pink"></span>Gränsöverskridande<br>
+  <span style="background:cyan"></span>Nätverk<br>
+  <span style="background:gray"></span>Enskilda företag
+</div>
 
-    const catContainer = document.getElementById('category-list');
-    Object.keys(categoryLayers).forEach(cat => {
-      const div = document.createElement('div'); div.className='category';
-      const cb = document.createElement('input'); cb.type='checkbox'; cb.id=cat;
-      cb.addEventListener('change', updateDisplay);
-      const lbl = document.createElement('label'); lbl.htmlFor=cat; lbl.innerText=cat;
-      div.append(cb,lbl);
-      catContainer.appendChild(div);
-    });
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Skapa karta
+var map = L.map('map').setView([63.5, 13.5], 6);
 
-    const ortFilter = document.getElementById('ort-filter');
-    [...new Set(aktorer.map(a=>a.ort))].sort().forEach(o => {
-      const opt = document.createElement('option'); opt.value=o; opt.innerText=o;
-      ortFilter.appendChild(opt);
-    });
-    ortFilter.addEventListener('change',updateDisplay);
+// OpenStreetMap baslager
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+}).addTo(map);
 
-    const listDiv = document.getElementById('aktor-list');
-    function updateDisplay(){
-      Object.values(categoryLayers).forEach(l=>l.remove());
-      listDiv.innerHTML='';
+// Färger per kategori
+var categoryColors = {
+  "Näringsliv": "red",
+  "Offentlig sektor": "blue",
+  "Universitet/Forskning": "green",
+  "Kultur": "orange",
+  "Sport": "purple",
+  "Finansiering": "brown",
+  "Gränsöverskridande": "pink",
+  "Nätverk": "cyan",
+  "Enskilda företag": "gray",
+  "": "black"
+};
 
-      const selectedCats = [...catContainer.querySelectorAll('input:checked')].map(cb=>cb.id);
-      const selOrt = ortFilter.value;
-
-      aktorer.forEach(a => {
-        if(selectedCats.includes(a.kategori) && (!selOrt || a.ort===selOrt)) {
-          const div = document.createElement('div'); div.className='aktor';
-          div.innerText = `${a.namn} (${a.ort})`;
-          listDiv.appendChild(div);
-          categoryLayers[a.kategori].addTo(map);
-        }
-      });
+// --- GeoJSON för regioner (feta linjer) ---
+var regionsGeoJSON = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"name":"Jämtland Härjedalen"},
+      "geometry": {"type":"Polygon","coordinates":[[[11,63],[15,63],[15,64],[11,64],[11,63]]]}
+    },
+    {
+      "type": "Feature",
+      "properties": {"name":"Trøndelag"},
+      "geometry": {"type":"Polygon","coordinates":[[[10,63],[15,63],[15,65],[10,65],[10,63]]]}
     }
-  </script>
+  ]
+};
+L.geoJSON(regionsGeoJSON, {style:{color:"black", weight:3, fill:false}}).addTo(map);
+
+// --- GeoJSON för kommuner (tunna linjer) ---
+var kommunerGeoJSON = {
+  "type": "FeatureCollection",
+  "features": [
+    {"type":"Feature","properties":{"name":"Östersund"},"geometry":{"type":"Polygon","coordinates":[[[12.6,63.1],[12.8,63.1],[12.8,63.3],[12.6,63.3],[12.6,63.1]]]}},
+    {"type":"Feature","properties":{"name":"Åre"},"geometry":{"type":"Polygon","coordinates":[[[12.3,63.2],[12.5,63.2],[12.5,63.4],[12.3,63.4],[12.3,63.2]]]}},
+    {"type":"Feature","properties":{"name":"Trondheim"},"geometry":{"type":"Polygon","coordinates":[[[10.4,63.4],[10.6,63.4],[10.6,63.6],[10.4,63.6],[10.4,63.4]]]}}
+    // Lägg till fler kommuner med riktiga koordinater
+  ]
+};
+L.geoJSON(kommunerGeoJSON, {style:{color:"black", weight:1, fill:false}}).addTo(map);
+
+// --- Aktörer ---
+var actors = [
+  {name:"Samling Näringsliv", category:"Näringsliv", city:"Östersund", lat:63.18, lon:14.63},
+  {name:"IUC Jämtland Härjedalen", category:"Näringsliv", city:"Östersund", lat:63.18, lon:14.64},
+  {name:"Handelskammaren Mitt", category:"Näringsliv", city:"Östersund", lat:63.18, lon:14.65},
+  {name:"Företagarna", category:"Näringsliv", city:"Östersund", lat:63.17, lon:14.63},
+  {name:"Jämtland Härjedalen Turism (JHT)", category:"Näringsliv", city:"Östersund", lat:63.17, lon:14.64},
+  {name:"NHO Næringslivets Hovedorganisasjon", category:"Näringsliv", city:"Trondheim", lat:63.43, lon:10.39},
+  {name:"Meråkerrennet", category:"Sport", city:"Meråker", lat:63.36, lon:11.66}
+  // Lägg till alla 235 aktörer med lat/lon
+];
+
+// Skapa markörer
+var markers = [];
+actors.forEach(function(a){
+  var marker = L.circleMarker([a.lat, a.lon], {
+    radius:6,
+    color: categoryColors[a.category] || "black",
+    fillOpacity:0.8
+  }).bindPopup("<b>"+a.name+"</b><br>"+a.category+"<br>"+a.city).addTo(map);
+  marker.actor = a;
+  markers.push(marker);
+});
+
+// --- Lista över aktörer ---
+function updateList() {
+  var cat = document.getElementById("categoryFilter").value;
+  var city = document.getElementById("cityFilter").value;
+  var list = document.getElementById("actorList");
+  list.innerHTML = "";
+  markers.forEach(function(m){
+    var show = (cat==="all" || m.actor.category===cat) && (city==="all" || m.actor.city===city);
+    if(show){
+      var li = document.createElement("li");
+      li.textContent = m.actor.name + " (" + m.actor.city + ")";
+      li.onclick = function(){ map.setView([m.actor.lat, m.actor.lon],10); m.openPopup(); };
+      list.appendChild(li);
+    }
+    m.setStyle({opacity: show?1:0, fillOpacity: show?0.8:0});
+  });
+}
+document.getElementById("categoryFilter").addEventListener("change", updateList);
+document.getElementById("cityFilter").addEventListener("change", updateList);
+updateList();
+</script>
+
 </body>
 </html>
