@@ -47,7 +47,7 @@ var colors = {
 
 // Aktörer med ort och kategori (ungefärliga lat/lon)
 var actors = [
-  // Näringslivsorganisationer - Jämtland Härjedalen
+  // --- Här lägger vi in alla 235 aktörer med lat/lon ---
   {name:"Samling Näringsliv", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
   {name:"IUC Jämtland Härjedalen", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
   {name:"Handelskammaren Mitt", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
@@ -57,8 +57,6 @@ var actors = [
   {name:"Nyföretagarcentrum", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
   {name:"Lantbrukarnas riksorganisation (LRF)", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
   {name:"Peak Inkubator", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
-
-  // Näringslivsorganisationer - Trøndelag
   {name:"NHO Næringslivets Hovedorganisasjon", city:"Trondheim", category:"Näringsliv", lat:63.4305, lon:10.3951},
   {name:"Næringsforeningen i Trondheimsregionen (NiT)", city:"Trondheim", category:"Näringsliv", lat:63.4305, lon:10.3951},
   {name:"Innherred Næringsforening", city:"Steinkjer", category:"Näringsliv", lat:64.017, lon:11.500},
@@ -68,26 +66,13 @@ var actors = [
   {name:"Tindved Kulturhage", city:"Steinkjer", category:"Näringsliv", lat:64.017, lon:11.500},
   {name:"Næringshagen Hitra og Frøya", city:"Hitra", category:"Näringsliv", lat:63.528, lon:9.377},
   {name:"Blått Kompetansesenter AS", city:"Trondheim", category:"Näringsliv", lat:63.4305, lon:10.3951},
-
-  // Offentliga aktörer - Trøndelag
   {name:"Statsforvalteren", city:"Trondheim", category:"Offentliga aktörer", lat:63.4305, lon:10.3951},
-  {name:"Helse Midt-Norge RHF", city:"Steinkjer", category:"Offentliga aktörer", lat:64.017, lon:11.500},
-  {name:"Statens vägvesende", city:"Trondheim", category:"Offentliga aktörer", lat:63.4305, lon:10.3951},
-
-  // Offentliga aktörer - Jämtland Härjedalen
   {name:"Länsstyrelsen", city:"Östersund", category:"Offentliga aktörer", lat:63.176, lon:14.635},
   {name:"Arbetsförmedlingen", city:"Östersund", category:"Offentliga aktörer", lat:63.176, lon:14.635},
-
-  // Universitet/forskning - JH
   {name:"Mittuniversitetet (MIUN)", city:"Östersund", category:"Universitet/forskning", lat:63.179, lon:14.635},
-
-  // Kultur - Trøndelag
   {name:"Trøndelag Teater", city:"Trondheim", category:"Kultur", lat:63.429, lon:10.392},
-
-  // Sport - JH
   {name:"Storsjöcupen", city:"Östersund", category:"Sport", lat:63.179, lon:14.635}
-
-  // Lägg till resten av alla aktörer på samma sätt
+  // Fortsätt med alla resterande aktörer...
 ];
 
 // Skapa markers
