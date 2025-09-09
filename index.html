@@ -1,49 +1,113 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <title>Aktörskarta JH & Trøndelag</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    #map { height: 100vh; width: 100%; }
-  </style>
+<meta charset="UTF-8">
+<title>Gränsöverskridande aktörer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+<style>
+  body { margin:0; padding:0; font-family: sans-serif; }
+  #map { height: 80vh; width: 100%; }
+  #list { max-height: 20vh; overflow-y: auto; padding: 10px; }
+  .category-red { color: red; }
+  .category-blue { color: blue; }
+  .category-yellow { color: goldenrod; }
+  .category-green { color: green; }
+  .category-orange { color: orange; }
+  ul { list-style: none; padding-left: 0; }
+  li { cursor: pointer; margin-bottom: 2px; }
+</style>
 </head>
 <body>
+
+<h2>Gränsöverskridande aktörer – klicka på namn för att se på karta</h2>
+<div id="list"></div>
 <div id="map"></div>
 
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  var map = L.map('map').setView([63.0, 12.0], 6);
+// Initiera karta
+var map = L.map('map').setView([63.0, 12.0], 6);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
+// Lägg till OpenStreetMap
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
 
-  var actors = [
-    {"name":"Samling Näringsliv","category":"Näringslivsorganisationer - Jämtland Härjedalen","city":"Östersund","lat":63.17917,"lon":14.63583},
-    {"name":"IUC Jämtland Härjedalen","category":"Näringslivsorganisationer - Jämtland Härjedalen","city":"Östersund","lat":63.17917,"lon":14.63583},
-    {"name":"Handelskammaren Mitt","category":"Näringslivsorganisationer - Jämtland Härjedalen","city":"Östersund","lat":63.17917,"lon":14.63583},
-    {"name":"Företagarna","category":"Näringslivsorganisationer - Jämtland Härjedalen","city":"Östersund","lat":63.17917,"lon":14.63583},
-    {"name":"Jämtland Härjedalen Turism (JHT)","category":"Näringslivsorganisationer - Jämtland Härjedalen","city":"Östersund","lat":63.17917,"lon":14.63583},
-    {"name":"Svenskt Näringsliv Jämtland","category":"Näringslivsorganisationer - Jämtland Härjedalen","city":"Östersund","lat":63.17917,"lon":14.63583},
-    {"name":"Nyföretagarcentrum","category":"Näringslivsorganisationer - Jämtland Härjedalen","city":"Östersund","lat":63.17917,"lon":14.63583},
-    {"name":"Lantbrukarnas riksorganisation (LRF)","category":"Näringslivsorganisationer - Jämtland Härjedalen","city":"Östersund","lat":63.17917,"lon":14.63583},
-    {"name":"Peak Inkubator","category":"Näringslivsorganisationer - Jämtland Härjedalen","city":"Östersund","lat":63.17917,"lon":14.63583},
-    {"name":"NHO Næringslivets Hovedorganisasjon","category":"Näringslivsorganisationer - Trøndelag","city":"Trondheim","lat":63.44683,"lon":10.42191},
-    {"name":"Næringsforeningen i Trondheimsregionen (NiT)","category":"Näringslivsorganisationer - Trøndelag","city":"Trondheim","lat":63.44683,"lon":10.42191},
-    {"name":"Innherred Næringsforening","category":"Näringslivsorganisationer - Trøndelag","city":"Steinkjer","lat":64.01519,"lon":11.49526},
-    {"name":"Rørosregionen Næringshage","category":"Näringslivsorganisationer - Trøndelag","city":"Røros","lat":62.5747,"lon":11.3842},
-    // ... fortsätt med alla andra aktörer på samma sätt
-  ];
+// Data: namn, lat, lon, kategori
+var actors = [
+  {name:"Samling Näringsliv", lat:63.17917, lon:14.63583, category:"red"},
+  {name:"IUC Jämtland Härjedalen", lat:63.17917, lon:14.63583, category:"red"},
+  {name:"Handelskammaren Mitt", lat:63.17917, lon:14.63583, category:"red"},
+  {name:"Företagarna", lat:63.17917, lon:14.63583, category:"red"},
+  {name:"Jämtland Härjedalen Turism (JHT)", lat:63.17917, lon:14.63583, category:"red"},
+  {name:"Svenskt Näringsliv Jämtland", lat:63.17917, lon:14.63583, category:"red"},
+  {name:"Nyföretagarcentrum", lat:63.17917, lon:14.63583, category:"red"},
+  {name:"Lantbrukarnas riksorganisation (LRF)", lat:63.17917, lon:14.63583, category:"red"},
+  {name:"Peak Inkubator", lat:63.17917, lon:14.63583, category:"red"},
+  
+  {name:"NHO Næringslivets Hovedorganisasjon", lat:63.44683, lon:10.42191, category:"red"},
+  {name:"Næringsforeningen i Trondheimsregionen (NiT)", lat:63.44683, lon:10.42191, category:"red"},
+  {name:"Innherred Næringsforening", lat:64.01519, lon:11.49526, category:"red"},
+  {name:"Rørosregionen Næringshage", lat:62.5747, lon:11.3842, category:"red"},
+  {name:"Nasjonalparken Næringshage", lat:62.5747, lon:11.3842, category:"red"},
+  {name:"FI Næringshage", lat:64.01519, lon:11.49526, category:"red"},
+  {name:"Tindved Kulturhage", lat:64.01519, lon:11.49526, category:"red"},
+  {name:"Næringshagen Hitra og Frøya", lat:63.5453, lon:8.9320, category:"red"},
+  {name:"Blått Kompetansesenter AS", lat:63.44683, lon:10.42191, category:"red"},
+  {name:"INAM AS (Innovasjon Namdal)", lat:64.4662, lon:11.4957, category:"red"},
+  {name:"Thams Innovasjon AS", lat:63.44683, lon:10.42191, category:"red"},
+  {name:"Naeringsforeningen i Vaernesregionen", lat:63.4669, lon:11.1863, category:"red"},
+  {name:"Proneo", lat:64.01519, lon:11.49526, category:"red"},
+  {name:"Fremtidens Industri AS (FI)", lat:63.44683, lon:10.42191, category:"red"},
+  {name:"Trøndelag Reiseliv", lat:63.44683, lon:10.42191, category:"red"},
+  {name:"Nordsec (tidigare Midsec)", lat:63.44683, lon:10.42191, category:"red"},
+  {name:"Industrinavet i Trøndelag", lat:63.44683, lon:10.42191, category:"red"},
+  {name:"RENERGY – Renewable Energy Cluster", lat:63.44683, lon:10.42191, category:"red"},
+  {name:"WoodWorks! Cluster", lat:63.44683, lon:10.42191, category:"red"}
+];
 
-  actors.forEach(function(actor){
-    L.circleMarker([actor.lat, actor.lon], {
-      radius: 6,
-      color: '#ff6600',
-      fillColor: '#ff9933',
-      fillOpacity: 0.8
-    }).addTo(map).bindPopup("<strong>"+actor.name+"</strong><br>"+actor.category+"<br>"+actor.city);
-  });
+// Lägg till markörer
+var markers = [];
+actors.forEach(function(actor){
+  var color;
+  switch(actor.category){
+    case "red": color="red"; break;
+    case "blue": color="blue"; break;
+    case "yellow": color="goldenrod"; break;
+    case "green": color="green"; break;
+    case "orange": color="orange"; break;
+    default: color="black";
+  }
+  var marker = L.circleMarker([actor.lat, actor.lon], {
+    color: color,
+    radius: 8,
+    fillOpacity: 0.7
+  }).bindPopup("<b>"+actor.name+"</b>");
+  marker.addTo(map);
+  markers.push({marker: marker, name: actor.name});
+});
+
+// Skapa alfabetisk lista
+markers.sort((a,b)=>a.name.localeCompare(b.name));
+var listDiv = document.getElementById("list");
+var ul = document.createElement("ul");
+markers.forEach(function(item){
+  var li = document.createElement("li");
+  li.textContent = item.name;
+  li.style.color = item.marker.options.color;
+  li.onclick = function(){ 
+    map.setView(item.marker.getLatLng(), 12); 
+    item.marker.openPopup();
+  };
+  ul.appendChild(li);
+});
+listDiv.appendChild(ul);
+
 </script>
 </body>
 </html>
