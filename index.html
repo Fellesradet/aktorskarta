@@ -7,10 +7,10 @@
           integrity="sha256-sA+g9kL7oE2rJGV+6FvTmxCz9A+k5VtZoG5uUo7pV+0="
           crossorigin=""/>
     <style>
-        #map { height: 90vh; width: 100%; }
         body { font-family: Arial, sans-serif; margin:0; padding:0; }
         h1 { text-align:center; margin: 10px 0; }
-        #dropdown { margin: 10px; width: 100%; max-width: 400px; display:block; margin-left:auto; margin-right:auto; }
+        #dropdown { margin: 10px auto; width: 90%; max-width: 500px; display:block; }
+        #map { height: 90vh; width: 100%; }
     </style>
 </head>
 <body>
@@ -24,75 +24,76 @@
         integrity="sha256-o9N1j7kN4Rj2bVxhR3Q1rGGWjZy3A0cI+4jYwDz3Zj4="
         crossorigin=""></script>
 <script>
-    const map = L.map('map').setView([63.0, 12.5], 6);
+const map = L.map('map').setView([63.0, 12.5], 6);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '© OpenStreetMap'
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 18,
+    attribution: '© OpenStreetMap'
+}).addTo(map);
+
+// Komplett lista över aktörer med färgkod
+const actors = [
+    {name:"Almi", category:"Offentliga aktörer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"blue"},
+    {name:"Arbetsförmedlingen", category:"Offentliga aktörer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"blue"},
+    {name:"Atlantbanan", category:"Gränsöverskridande samarbeten regionalt", lat:63.44683, lon:10.42191, color:"green"},
+    {name:"Basta – Litteraturhuset i Trondheim", category:"Kulturevent - Trøndelag", lat:63.44683, lon:10.42191, color:"orange"},
+    {name:"BNI City Östersund", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.17917, lon:14.63583, color:"green"},
+    {name:"Bærekraftsnettverket i Trøndelag", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.44683, lon:10.42191, color:"green"},
+    {name:"Business Region MidSweden", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.17917, lon:14.63583, color:"green"},
+    {name:"Connect Midt Norge", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.44683, lon:10.42191, color:"green"},
+    {name:"Digs Incubator Trondheim", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.44683, lon:10.42191, color:"green"},
+    {name:"Driv Innovation", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.17917, lon:14.63583, color:"green"},
+    {name:"E14 Invest", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.4167, lon:13.0833, color:"green"},
+    {name:"Falstadsenteret", category:"Universitet, utbildnings och forskningsmiljöer - Trøndelag", lat:63.6500, lon:11.2833, color:"yellow"},
+    {name:"Föreningen Norden i Östersund", category:"Gränsöverskridande samarbeten regionalt", lat:63.17917, lon:14.63583, color:"green"},
+    {name:"Föreningen Norden i Trondheim", category:"Gränsöverskridande samarbeten regionalt", lat:63.44683, lon:10.42191, color:"green"},
+    {name:"Gaaltije", category:"Civilsamhället kultur - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"orange"},
+    {name:"Handelskammaren Mitt", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
+    {name:"Hushållningssällskapet", category:"Universitet, utbildnings och forskningsmiljöer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"yellow"},
+    {name:"IUC Jämtland Härjedalen", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
+    {name:"Jämtland Härjedalen Turism (JHT)", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
+    {name:"Kul Tur", category:"Kulturevent - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"orange"},
+    {name:"Mittuniversitetet (MIUN)", category:"Universitet, utbildnings och forskningsmiljöer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"yellow"},
+    {name:"Naeringsforeningen i Vaernesregionen", category:"Näringslivsorganisationer - Trøndelag", lat:63.4669, lon:11.1863, color:"red"},
+    {name:"NHO Næringslivets Hovedorganisasjon", category:"Näringslivsorganisationer - Trøndelag", lat:63.44683, lon:10.42191, color:"red"},
+    {name:"NTNU:s Næringslivsringer", category:"Universitet, utbildnings och forskningsmiljöer - Trøndelag", lat:63.44683, lon:10.42191, color:"yellow"},
+    {name:"Norwegian University of Science and Technology NTNU", category:"Universitet, utbildnings och forskningsmiljöer - Trøndelag", lat:63.44683, lon:10.42191, color:"yellow"},
+    {name:"Nyföretagarcentrum", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
+    {name:"Peak Inkubator", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
+    {name:"Polisen", category:"Offentliga aktörer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"blue"},
+    {name:"Rørosregionen Næringshage", category:"Näringslivsorganisationer - Trøndelag", lat:62.5747, lon:11.3842, color:"red"},
+    {name:"Svenskt Näringsliv Jämtland", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
+    {name:"Sametinget", category:"Offentliga aktörer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"blue"},
+    {name:"Statsforvalteren", category:"Offentliga aktörer - Trøndelag", lat:63.44683, lon:10.42191, color:"blue"},
+    {name:"Trøndelag Reiseliv", category:"Näringslivsorganisationer - Trøndelag", lat:63.44683, lon:10.42191, color:"red"},
+    {name:"Trondheim Tech Port", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.44683, lon:10.42191, color:"green"},
+];
+
+// Sortera alfabetiskt
+actors.sort((a,b) => a.name.localeCompare(b.name));
+
+// Lägg till markörer och drop-down
+actors.forEach(actor => {
+    const marker = L.circleMarker([actor.lat, actor.lon], {
+        radius: 8,
+        color: actor.color,
+        fillOpacity: 0.8
     }).addTo(map);
+    marker.bindPopup(`<b>${actor.name}</b><br>${actor.category}`);
 
-    // Lista över aktörer
-    const actors = [
-        {name:"Almi", category:"Offentliga aktörer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"blue"},
-        {name:"Arbetsförmedlingen", category:"Offentliga aktörer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"blue"},
-        {name:"Blått Kompetansesenter AS", category:"Näringslivsorganisationer - Trøndelag", lat:63.44683, lon:10.42191, color:"red"},
-        {name:"BNI City Östersund", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.17917, lon:14.63583, color:"green"},
-        {name:"Bærekraftsnettverket i Trøndelag", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.44683, lon:10.42191, color:"green"},
-        {name:"Business Region MidSweden", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.17917, lon:14.63583, color:"green"},
-        {name:"Connect Midt Norge", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.44683, lon:10.42191, color:"green"},
-        {name:"Digs Incubator Trondheim", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.44683, lon:10.42191, color:"green"},
-        {name:"Driv Innovation", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.17917, lon:14.63583, color:"green"},
-        {name:"E14 Invest", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.4167, lon:13.0833, color:"green"},
-        {name:"Falstadsenteret", category:"Universitet, utbildnings och forskningsmiljöer - Trøndelag", lat:63.6500, lon:11.2833, color:"yellow"},
-        {name:"Föreningen Norden i Östersund", category:"Gränsöverskridande samarbeten regionalt", lat:63.17917, lon:14.63583, color:"green"},
-        {name:"Föreningen Norden i Trondheim", category:"Gränsöverskridande samarbeten regionalt", lat:63.44683, lon:10.42191, color:"green"},
-        {name:"Gaaltije", category:"Civilsamhället kultur - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"orange"},
-        {name:"Handelskammaren Mitt", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
-        {name:"Hushållningssällskapet", category:"Universitet, utbildnings och forskningsmiljöer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"yellow"},
-        {name:"IUC Jämtland Härjedalen", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
-        {name:"Jämtland Härjedalen Turism (JHT)", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
-        {name:"Kul Tur", category:"Kulturevent - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"orange"},
-        {name:"Mittuniversitetet (MIUN)", category:"Universitet, utbildnings och forskningsmiljöer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"yellow"},
-        {name:"Naeringsforeningen i Vaernesregionen", category:"Näringslivsorganisationer - Trøndelag", lat:63.4669, lon:11.1863, color:"red"},
-        {name:"NHO Næringslivets Hovedorganisasjon", category:"Näringslivsorganisationer - Trøndelag", lat:63.44683, lon:10.42191, color:"red"},
-        {name:"NTNU:s Næringslivsringer", category:"Universitet, utbildnings och forskningsmiljöer - Trøndelag", lat:63.44683, lon:10.42191, color:"yellow"},
-        {name:"Norwegian University of Science and Technology NTNU", category:"Universitet, utbildnings och forskningsmiljöer - Trøndelag", lat:63.44683, lon:10.42191, color:"yellow"},
-        {name:"Nyföretagarcentrum", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
-        {name:"Platform North", category:"Gränsöverskridande samarbeten regionalt", lat:63.17917, lon:14.63583, color:"green"},
-        {name:"Peak Inkubator", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
-        {name:"Polisen", category:"Offentliga aktörer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"blue"},
-        {name:"Rørosregionen Næringshage", category:"Näringslivsorganisationer - Trøndelag", lat:62.5747, lon:11.3842, color:"red"},
-        {name:"Svenskt Näringsliv Jämtland", category:"Näringslivsorganisationer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"red"},
-        {name:"Sametinget", category:"Offentliga aktörer - Jämtland Härjedalen", lat:63.17917, lon:14.63583, color:"blue"},
-        {name:"Statsforvalteren", category:"Offentliga aktörer - Trøndelag", lat:63.44683, lon:10.42191, color:"blue"},
-        {name:"Trøndelag Reiseliv", category:"Näringslivsorganisationer - Trøndelag", lat:63.44683, lon:10.42191, color:"red"},
-        {name:"Trondheim Tech Port", category:"Nätverk för kompetens, kapital och företagande - Trøndelag", lat:63.44683, lon:10.42191, color:"green"},
-        {name:"Uniper", category:"Enskilda företag/bedrifter", lat:63.17917, lon:14.63583, color:"red"}, // kan tas bort om du vill
-    ];
+    const option = document.createElement("option");
+    option.value = `${actor.lat},${actor.lon}`;
+    option.text = actor.name;
+    document.getElementById("dropdown").appendChild(option);
+});
 
-    // Lägg till markörer
-    actors.forEach(actor => {
-        const marker = L.circleMarker([actor.lat, actor.lon], {
-            radius: 8,
-            color: actor.color,
-            fillOpacity: 0.8
-        }).addTo(map);
-        marker.bindPopup(`<b>${actor.name}</b><br>${actor.category}`);
-
-        // Lägg till i drop-down
-        const option = document.createElement("option");
-        option.value = `${actor.lat},${actor.lon}`;
-        option.text = actor.name;
-        document.getElementById("dropdown").appendChild(option);
-    });
-
-    // Zooma till vald aktör
-    document.getElementById("dropdown").addEventListener("change", function() {
-        if(this.value){
-            const coords = this.value.split(",");
-            map.setView([parseFloat(coords[0]), parseFloat(coords[1])], 10);
-        }
-    });
+// Zooma till vald aktör
+document.getElementById("dropdown").addEventListener("change", function() {
+    if(this.value){
+        const coords = this.value.split(",");
+        map.setView([parseFloat(coords[0]), parseFloat(coords[1])], 10);
+    }
+});
 </script>
 </body>
 </html>
