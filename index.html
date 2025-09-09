@@ -1,102 +1,128 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <title>Aktörskarta – Fellesrådet för Trøndelag och Jämtland Härjedalen</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <style>
-        body { font-family: Arial, sans-serif; margin:0; padding:0; }
-        h1 { text-align:center; margin: 10px 0; }
-        #dropdown { margin: 10px auto; width: 90%; max-width: 600px; display:block; }
-        #map { height: 90vh; width: 100%; }
-        optgroup { font-weight:bold; }
-        /* Färger för optioner (flyttas till JS) */
-        .red { color: red; }
-        .blue { color: blue; }
-        .yellow { color: goldenrod; }
-        .green { color: green; }
-        .orange { color: orange; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Interaktiv Aktörskarta</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+  <style>
+    body { margin:0; padding:0; }
+    #map { width: 100%; height: 100vh; }
+    .legend {
+      background: white; 
+      padding: 10px; 
+      line-height: 1.5em;
+      border-radius: 5px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    .legend span {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .filter-container {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+  </style>
 </head>
 <body>
-<h1>Aktörskarta – Fellesrådet för Trøndelag och Jämtland Härjedalen</h1>
-<select id="dropdown">
-    <option value="">-- Välj aktör --</option>
-</select>
-<div id="map"></div>
+  <div class="filter-container">
+    <label for="categoryFilter">Filtrera kategori:</label>
+    <select id="categoryFilter">
+      <option value="alla">Alla</option>
+      <option value="naringsliv">Näringsliv</option>
+      <option value="offentlig">Offentlig sektor</option>
+      <option value="utbildning">Universitet/forskning</option>
+      <option value="finansiering">Gränsöverskridande samarbeten & finansiering</option>
+      <option value="kultur">Kultur & sport</option>
+    </select>
+  </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const map = L.map('map').setView([63.0, 12.5], 6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(map);
+  <div id="map"></div>
 
-// Färger för kategorier
-const categoryColors = {
-    "Näringslivsorganisationer - Jämtland Härjedalen":"red",
-    "Näringslivsorganisationer - Trøndelag":"red",
-    "Offentliga aktörer - Jämtland Härjedalen":"blue",
-    "Offentliga aktörer - Trøndelag":"blue",
-    "Universitet, utbildnings och forskningsmiljöer - Jämtland Härjedalen":"yellow",
-    "Universitet, utbildnings och forskningsmiljöer - Trøndelag":"yellow",
-    "Gränsöverskridande samarbeten regionalt":"green",
-    "Gränsöverskridande samarbeten Norge - Sverige":"green",
-    "Europeiska och nordiska samarbeten":"green",
-    "Nordens gränskommittéer":"green",
-    "Nätverk för kompetens, kapital och företagande - Trøndelag":"green",
-    "Nätverk för kompetens, kapital och företagande - Jämtland Härjedalen":"green",
-    "Civilsamhället kultur - Trøndelag":"orange",
-    "Civilsamhället kultur - Jämtland Härjedalen":"orange",
-    "Kulturevent - Trøndelag":"orange",
-    "Kulturevent - Jämtland Härjedalen":"orange",
-    "Sportevent - Trøndelag":"orange",
-    "Sportevent - Jämtland Härjedalen":"orange",
-    "Finansiering":"green"
-};
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script>
+    // Initiera kartan
+    var map = L.map('map').setView([63.0, 12.5], 6); // Mittpunkt Jämtland/Trøndelag
 
-// Komplett aktörslista (exklusive de fem enskilda företagen)
-const actors = [
-    // (Samma lista som tidigare)
-];
-
-// Skapa grupper i drop-down
-const dropdown = document.getElementById("dropdown");
-const grouped = {};
-actors.forEach(actor => {
-    if(!grouped[actor.category]) grouped[actor.category] = [];
-    grouped[actor.category].push(actor);
-});
-
-// Lägg till optgroup och options med färg
-Object.keys(grouped).sort().forEach(category => {
-    const optgroup = document.createElement("optgroup");
-    optgroup.label = category;
-    grouped[category].sort((a,b) => a.name.localeCompare(b.name)).forEach(actor => {
-        const option = document.createElement("option");
-        option.value = `${actor.lat},${actor.lon}`;
-        option.text = actor.name;
-        option.className = categoryColors[category]; // färg på texten
-        optgroup.appendChild(option);
-    });
-    dropdown.appendChild(optgroup);
-});
-
-// Lägg till markörer
-actors.forEach(actor => {
-    const marker = L.circleMarker([actor.lat, actor.lon], {
-        radius: 8,
-        color: categoryColors[actor.category],
-        fillOpacity: 0.8
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
-    marker.bindPopup(`<b>${actor.name}</b><br>${actor.category}`);
-});
 
-// Zooma till vald aktör
-dropdown.addEventListener("change", function() {
-    if(this.value){
-        const coords = this.value.split(",");
-        map.setView([parseFloat(coords[0]), parseFloat(coords[1])], 10);
+    // Ikoner för olika kategorier
+    var icons = {
+      naringsliv: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/business.png', iconSize:[30,30]}),
+      offentlig: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/government.png', iconSize:[30,30]}),
+      utbildning: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/school.png', iconSize:[30,30]}),
+      finansiering: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/money-bag.png', iconSize:[30,30]}),
+      kultur: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/theatre-mask.png', iconSize:[30,30]})
+    };
+
+    // Färgkod för legend
+    var colors = {
+      naringsliv: "red",
+      offentlig: "blue",
+      utbildning: "yellow",
+      finansiering: "green",
+      kultur: "orange"
+    };
+
+    // Exempel på aktörer, fyll på med dina egna
+    var actors = [
+      {name:"Företag A", category:"naringsliv", coords:[63.17, 14.63], link:"https://example.com"},
+      {name:"Kommun B", category:"offentlig", coords:[63.43, 10.40], link:"https://example.com"},
+      {name:"Universitet C", category:"utbildning", coords:[63.43, 10.40], link:"https://example.com"},
+      {name:"Fond D", category:"finansiering", coords:[63.78, 11.30], link:"https://example.com"},
+      {name:"Kultur E", category:"kultur", coords:[62.47, 11.33], link:"https://example.com"}
+    ];
+
+    var markers = L.markerClusterGroup();
+
+    actors.forEach(actor => {
+      var marker = L.marker(actor.coords, {icon: icons[actor.category]});
+      marker.bindPopup(`<b>${actor.name}</b><br>Kategori: ${actor.category}<br><a href="${actor.link}" target="_blank">Webb</a>`);
+      marker.actorCategory = actor.category; // för filtrering
+      markers.addLayer(marker);
+    });
+
+    map.addLayer(markers);
+
+    // Filter
+    document.getElementById("categoryFilter").addEventListener("change", function(){
+      var selected = this.value;
+      markers.clearLayers();
+      actors.forEach(actor => {
+        if(selected === "alla" || actor.category === selected){
+          var marker = L.marker(actor.coords, {icon: icons[actor.category]});
+          marker.bindPopup(`<b>${actor.name}</b><br>Kategori: ${actor.category}<br><a href="${actor.link}" target="_blank">Webb</a>`);
+          markers.addLayer(marker);
+        }
+      });
+    });
+
+    // Legend
+    var legend = L.control({position: 'bottomright'});
+    legend.onAdd = function(map){
+      var div = L.DomUtil.create('div', 'legend');
+      div.innerHTML = "<h4>Kategorier</h4>";
+      for(var key in colors){
+        div.innerHTML += `<span style="background:${colors[key]}"></span>${key}<br>`;
+      }
+      return div;
     }
-});
-</script>
+    legend.addTo(map);
+  </script>
 </body>
 </html>
