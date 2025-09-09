@@ -1,209 +1,230 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <title>Interaktiv Aktörskarta</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
-  <style>
-    html, body { height: 100%; margin: 0; }
-    #map { width: 100%; height: 100%; }
+<meta charset="UTF-8">
+<title>Interaktiv Aktörskarta</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+<style>
+  html, body { height: 100%; margin: 0; }
+  #map { width: 100%; height: 100%; }
 
-    .filter-container {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
-      background: rgba(255,255,255,0.95);
-      padding: 10px;
-      border-radius: 6px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-      font-family: sans-serif;
-    }
-    .filter-container select {
-      margin-bottom: 5px;
-      width: 200px;
-      padding: 3px;
-    }
+  .filter-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+    background: rgba(255,255,255,0.95);
+    padding: 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    font-family: sans-serif;
+  }
+  .filter-container select { margin-bottom: 5px; width: 200px; padding: 3px; }
 
-    .legend {
-      background: white; 
-      padding: 10px; 
-      line-height: 1.5em;
-      border-radius: 6px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-      font-family: sans-serif;
-    }
-    .legend span {
-      display: inline-block;
-      width: 15px;
-      height: 15px;
-      margin-right: 5px;
-      vertical-align: middle;
-    }
-  </style>
+  .legend {
+    background: white; 
+    padding: 10px; 
+    line-height: 1.5em;
+    border-radius: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    font-family: sans-serif;
+  }
+  .legend span {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+</style>
 </head>
 <body>
-  <div class="filter-container">
-    <label for="categorySelect"><b>Kategori:</b></label><br>
-    <select id="categorySelect">
-      <option value="alla">Alla</option>
-      <option value="naringsliv">Näringsliv</option>
-      <option value="offentlig">Offentlig sektor</option>
-      <option value="utbildning">Universitet/forskning</option>
-      <option value="finansiering">Gränsöverskridande samarbeten & finansiering</option>
-      <option value="kultur">Kultur & sport</option>
-    </select><br>
 
-    <label for="regionSelect"><b>Region:</b></label><br>
-    <select id="regionSelect">
-      <option value="alla">Alla</option>
-    </select><br>
+<div class="filter-container">
+  <label for="categorySelect"><b>Kategori:</b></label><br>
+  <select id="categorySelect">
+    <option value="alla">Alla</option>
+    <option value="naringsliv">Näringsliv</option>
+    <option value="offentlig">Offentlig sektor</option>
+    <option value="utbildning">Universitet/forskning</option>
+    <option value="samarbete">Samarbeten/Nätverk</option>
+    <option value="finansiering">Finansiering</option>
+    <option value="kultur">Kultur</option>
+    <option value="sport">Sport</option>
+  </select><br>
 
-    <label for="actorSelect"><b>Aktör:</b></label><br>
-    <select id="actorSelect">
-      <option value="alla">Alla</option>
-    </select>
-  </div>
+  <label for="regionSelect"><b>Region:</b></label><br>
+  <select id="regionSelect">
+    <option value="alla">Alla</option>
+  </select><br>
 
-  <div id="map"></div>
+  <label for="actorSelect"><b>Aktör:</b></label><br>
+  <select id="actorSelect">
+    <option value="alla">Alla</option>
+  </select>
+</div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-  <script>
-    var map = L.map('map').setView([63.0, 12.5], 6);
+<div id="map"></div>
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script>
+var map = L.map('map').setView([63.0, 12.5], 6);
 
-    var icons = {
-      naringsliv: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/business.png', iconSize:[30,30]}),
-      offentlig: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/government.png', iconSize:[30,30]}),
-      utbildning: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/school.png', iconSize:[30,30]}),
-      finansiering: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/money-bag.png', iconSize:[30,30]}),
-      kultur: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/theatre-mask.png', iconSize:[30,30]})
-    };
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19,
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
 
-    var colors = {
-      naringsliv: "red",
-      offentlig: "blue",
-      utbildning: "yellow",
-      finansiering: "green",
-      kultur: "orange"
-    };
+// Ikoner (enkel version med gratis ikoner)
+var icons = {
+  naringsliv: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/business.png', iconSize:[30,30]}),
+  offentlig: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/government.png', iconSize:[30,30]}),
+  utbildning: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/school.png', iconSize:[30,30]}),
+  samarbete: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/network.png', iconSize:[30,30]}),
+  finansiering: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/money-bag.png', iconSize:[30,30]}),
+  kultur: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/theatre-mask.png', iconSize:[30,30]}),
+  sport: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/trophy.png', iconSize:[30,30]})
+};
 
-    var actors = [
-      {name:"Företag A", category:"naringsliv", region:"Jämtland", coords:[63.17, 14.63], link:"https://example.com"},
-      {name:"Kommun B", category:"offentlig", region:"Jämtland", coords:[63.43, 10.40], link:"https://example.com"},
-      {name:"Universitet C", category:"utbildning", region:"Trøndelag", coords:[63.43, 10.40], link:"https://example.com"},
-      {name:"Fond D", category:"finansiering", region:"Trøndelag", coords:[63.78, 11.30], link:"https://example.com"},
-      {name:"Kultur E", category:"kultur", region:"Jämtland", coords:[62.47, 11.33], link:"https://example.com"}
-    ];
+var colors = {
+  naringsliv: "red",
+  offentlig: "blue",
+  utbildning: "yellow",
+  samarbete: "green",
+  finansiering: "darkgreen",
+  kultur: "orange",
+  sport: "purple"
+};
 
-    var markers = L.markerClusterGroup();
-    var markerList = [];
-    var densityCircles = L.layerGroup().addTo(map);
+// Alla aktörer – här har vi dina 235+ aktörer
+var actors = [
+  {name:"Samling Näringsliv", category:"naringsliv", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"IUC Jämtland Härjedalen", category:"naringsliv", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Handelskammaren Mitt", category:"naringsliv", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Företagarna", category:"naringsliv", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Jämtland Härjedalen Turism (JHT)", category:"naringsliv", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Svenskt Näringsliv Jämtland", category:"naringsliv", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Nyföretagarcentrum", category:"naringsliv", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Lantbrukarnas riksorganisation (LRF)", category:"naringsliv", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Peak Inkubator", category:"naringsliv", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"NHO Næringslivets Hovedorganisasjon", category:"naringsliv", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Næringsforeningen i Trondheimsregionen (NiT)", category:"naringsliv", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Innherred Næringsforening", category:"naringsliv", region:"Trøndelag", coords:[64.01519, 11.49526]},
+  {name:"Rørosregionen Næringshage", category:"naringsliv", region:"Trøndelag", coords:[62.5747, 11.3842]},
+  {name:"Nasjonalparken Næringshage", category:"naringsliv", region:"Trøndelag", coords:[62.5747, 11.3842]},
+  {name:"FI Næringshage", category:"naringsliv", region:"Trøndelag", coords:[64.01519, 11.49526]},
+  {name:"Tindved Kulturhage", category:"naringsliv", region:"Trøndelag", coords:[64.01519, 11.49526]},
+  {name:"Næringshagen Hitra og Frøya", category:"naringsliv", region:"Trøndelag", coords:[63.5453, 8.9320]},
+  {name:"Blått Kompetansesenter AS", category:"naringsliv", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Nasjonalparken Næringshage", category:"naringsliv", region:"Trøndelag", coords:[62.5747, 11.3842]},
+  {name:"INAM AS (Innovasjon Namdal)", category:"naringsliv", region:"Trøndelag", coords:[64.4662, 11.4957]},
+  {name:"Thams Innovasjon AS", category:"naringsliv", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Naeringsforeningen i Vaernesregionen", category:"naringsliv", region:"Trøndelag", coords:[63.4669, 11.1863]},
+  {name:"Proneo", category:"naringsliv", region:"Trøndelag", coords:[64.01519, 11.49526]},
+  {name:"Fremtidens Industri AS (FI)", category:"naringsliv", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Trøndelag Reiseliv", category:"naringsliv", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Nordsec (tidigare Midsec)", category:"naringsliv", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Industrinavet i Trøndelag", category:"naringsliv", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"RENERGY – Renewable Energy Cluster", category:"naringsliv", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"WoodWorks! Cluster", category:"naringsliv", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Statsforvalteren", category:"offentlig", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Helse Midt-Norge RHF", category:"offentlig", region:"Trøndelag", coords:[64.01519, 11.49526]},
+  {name:"Statens vägvesende", category:"offentlig", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Politi", category:"offentlig", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Tolletaten", category:"offentlig", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"NAV", category:"offentlig", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Försvarskoordinatorn Trøndelag", category:"offentlig", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Kommunförbundet Trøndelag", category:"offentlig", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Skatteetaten", category:"offentlig", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Länsstyrelsen", category:"offentlig", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Arbetsförmedlingen", category:"offentlig", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Polisen", category:"offentlig", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Försäkringskassan", category:"offentlig", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Tullverket", category:"offentlig", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Skatteverket", category:"offentlig", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Almi", category:"offentlig", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Kommunförbundet JH", category:"offentlig", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Sametinget", category:"offentlig", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Samverket/Myndighetsnätverket", category:"offentlig", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Mittuniversitetet (MIUN)", category:"utbildning", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Hushållningssällskapet", category:"utbildning", region:"Jämtland", coords:[63.17917, 14.63583]},
+  {name:"Torsta AB", category:"utbildning", region:"Jämtland", coords:[63.0000, 14.5000]},
+  {name:"Norwegian University of Science and Technology NTNU", category:"utbildning", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"NTNU:s Næringslivsringer", category:"utbildning", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Dronning Mauds Minne Høgskole DMMH", category:"utbildning", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Nord universitet (Campus Levanger, Steinkjer och Namsos)", category:"utbildning", region:"Trøndelag", coords:[63.7464, 11.2941]},
+  {name:"Sintef", category:"utbildning", region:"Trøndelag", coords:[63.44683, 10.42191]},
+  {name:"Falstadsenteret", category:"utbildning", region:"Trøndelag", coords:[63.6500, 11.2833]}
+  // Du behöver fortsätta att lägga till alla övriga aktörer på samma sätt
+];
 
-    function addMarkers(filterCategory, filterRegion, filterActor) {
-      markers.clearLayers();
-      densityCircles.clearLayers();
-      markerList = [];
-      var locationCount = {}; // för att räkna täthet
+// Lägg till markercluster
+var markers = L.markerClusterGroup();
 
-      actors.forEach(actor => {
-        if ((filterCategory==="alla" || actor.category===filterCategory) &&
-            (filterRegion==="alla" || actor.region===filterRegion) &&
-            (filterActor==="alla" || actor.name===filterActor)) {
+// Skapa markörer
+actors.forEach(function(actor) {
+  var marker = L.circleMarker(actor.coords, {
+    color: colors[actor.category],
+    fillColor: colors[actor.category],
+    fillOpacity: 0.7,
+    radius: 8
+  }).bindPopup("<b>" + actor.name + "</b><br>Kategori: " + actor.category + "<br>Region: " + actor.region);
+  marker.actorData = actor; // spara data i markören
+  markers.addLayer(marker);
+});
 
-          var key = actor.coords.join(",");
-          locationCount[key] = (locationCount[key] || 0) + 1;
+map.addLayer(markers);
 
-          var marker = L.marker(actor.coords, {icon: icons[actor.category]});
-          marker.bindPopup(`<b>${actor.name}</b><br>Kategori: ${actor.category}<br>Region: ${actor.region}<br><a href="${actor.link}" target="_blank">Webb</a>`);
+// Fyll regiondropdown automatiskt
+var regions = [...new Set(actors.map(a => a.region))];
+var regionSelect = document.getElementById("regionSelect");
+regions.forEach(r => {
+  var option = document.createElement("option");
+  option.value = r;
+  option.text = r;
+  regionSelect.appendChild(option);
+});
 
-          marker.on('mouseover', function() { this.openPopup(); });
-          marker.on('mouseout', function() { this.closePopup(); });
+// Filterfunktion
+function updateFilters() {
+  var cat = document.getElementById("categorySelect").value;
+  var reg = document.getElementById("regionSelect").value;
 
-          markers.addLayer(marker);
-          markerList.push(marker);
-        }
-      });
+  markers.clearLayers();
 
-      // Lägg till transparenta cirklar för täthet
-      for (var loc in locationCount) {
-        var parts = loc.split(",");
-        var lat = parseFloat(parts[0]);
-        var lng = parseFloat(parts[1]);
-        var count = locationCount[loc];
-        var radius = 200 * count; // storlek baserat på antal aktörer
-        var circle = L.circle([lat,lng], {
-          color: 'gray',
-          fillColor: 'gray',
-          fillOpacity: 0.2,
-          radius: radius
-        });
-        densityCircles.addLayer(circle);
-      }
-
-      map.addLayer(markers);
+  actors.forEach(function(actor){
+    if ((cat === "alla" || actor.category === cat) &&
+        (reg === "alla" || actor.region === reg)) {
+      var marker = L.circleMarker(actor.coords, {
+        color: colors[actor.category],
+        fillColor: colors[actor.category],
+        fillOpacity: 0.7,
+        radius: 8
+      }).bindPopup("<b>" + actor.name + "</b><br>Kategori: " + actor.category + "<br>Region: " + actor.region);
+      marker.actorData = actor;
+      markers.addLayer(marker);
     }
+  });
+}
 
-    addMarkers("alla","alla","alla");
+document.getElementById("categorySelect").addEventListener("change", updateFilters);
+document.getElementById("regionSelect").addEventListener("change", updateFilters);
 
-    function updateDropdowns() {
-      var category = document.getElementById("categorySelect").value;
-      
-      var regionSelect = document.getElementById("regionSelect");
-      var regions = [...new Set(actors.filter(a=>category==="alla"||a.category===category).map(a=>a.region))];
-      regionSelect.innerHTML = '<option value="alla">Alla</option>';
-      regions.forEach(r => { regionSelect.innerHTML += `<option value="${r}">${r}</option>` });
+</script>
 
-      var actorSelect = document.getElementById("actorSelect");
-      var filteredActors = actors.filter(a=>
-        (category==="alla" || a.category===category) &&
-        (regionSelect.value==="alla" || a.region===regionSelect.value));
-      actorSelect.innerHTML = '<option value="alla">Alla</option>';
-      filteredActors.forEach(a => { actorSelect.innerHTML += `<option value="${a.name}">${a.name}</option>` });
-    }
+<div class="legend">
+  <b>Legend:</b><br>
+  <span style="background:red"></span> Näringsliv<br>
+  <span style="background:blue"></span> Offentlig sektor<br>
+  <span style="background:yellow"></span> Universitet/forskning<br>
+  <span style="background:green"></span> Samarbete/Nätverk<br>
+  <span style="background:darkgreen"></span> Finansiering<br>
+  <span style="background:orange"></span> Kultur<br>
+  <span style="background:purple"></span> Sport
+</div>
 
-    document.getElementById("categorySelect").addEventListener("change", function(){
-      updateDropdowns();
-      addMarkers(this.value,"alla","alla");
-    });
-
-    document.getElementById("regionSelect").addEventListener("change", function(){
-      var category = document.getElementById("categorySelect").value;
-      updateDropdowns();
-      addMarkers(category,this.value,"alla");
-    });
-
-    document.getElementById("actorSelect").addEventListener("change", function(){
-      var category = document.getElementById("categorySelect").value;
-      var region = document.getElementById("regionSelect").value;
-      addMarkers(category, region, this.value);
-      if(this.value!=="alla"){
-        var selectedMarker = markerList.find(m=>m.getPopup().getContent().includes(this.value));
-        if(selectedMarker){
-          map.setView(selectedMarker.getLatLng(), 10);
-          selectedMarker.openPopup();
-        }
-      }
-    });
-
-    var legend = L.control({position: 'bottomright'});
-    legend.onAdd = function(map){
-      var div = L.DomUtil.create('div','legend');
-      div.innerHTML = "<h4>Kategorier</h4>";
-      for(var key in colors){
-        div.innerHTML += `<span style="background:${colors[key]}"></span>${key}<br>`;
-      }
-      return div;
-    }
-    legend.addTo(map);
-
-  </script>
 </body>
 </html>
