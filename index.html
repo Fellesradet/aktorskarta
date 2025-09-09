@@ -10,7 +10,6 @@
     html, body { height: 100%; margin: 0; }
     #map { width: 100%; height: 100%; }
 
-    /* Filter-container */
     .filter-container {
       position: absolute;
       top: 10px;
@@ -28,7 +27,6 @@
       padding: 3px;
     }
 
-    /* Legend */
     .legend {
       background: white; 
       padding: 10px; 
@@ -74,7 +72,6 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script>
-    // Initiera kartan
     var map = L.map('map').setView([63.0, 12.5], 6);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -82,7 +79,6 @@
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Ikoner per kategori
     var icons = {
       naringsliv: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/business.png', iconSize:[30,30]}),
       offentlig: L.icon({iconUrl: 'https://img.icons8.com/color/48/000000/government.png', iconSize:[30,30]}),
@@ -99,7 +95,6 @@
       kultur: "orange"
     };
 
-    // Aktörer: fyll på med dina egna
     var actors = [
       {name:"Företag A", category:"naringsliv", region:"Jämtland", coords:[63.17, 14.63], link:"https://example.com"},
       {name:"Kommun B", category:"offentlig", region:"Jämtland", coords:[63.43, 10.40], link:"https://example.com"},
@@ -108,22 +103,27 @@
       {name:"Kultur E", category:"kultur", region:"Jämtland", coords:[62.47, 11.33], link:"https://example.com"}
     ];
 
-    // Marker cluster
     var markers = L.markerClusterGroup();
     var markerList = [];
+    var densityCircles = L.layerGroup().addTo(map);
 
     function addMarkers(filterCategory, filterRegion, filterActor) {
       markers.clearLayers();
+      densityCircles.clearLayers();
       markerList = [];
+      var locationCount = {}; // för att räkna täthet
+
       actors.forEach(actor => {
         if ((filterCategory==="alla" || actor.category===filterCategory) &&
             (filterRegion==="alla" || actor.region===filterRegion) &&
             (filterActor==="alla" || actor.name===filterActor)) {
 
+          var key = actor.coords.join(",");
+          locationCount[key] = (locationCount[key] || 0) + 1;
+
           var marker = L.marker(actor.coords, {icon: icons[actor.category]});
           marker.bindPopup(`<b>${actor.name}</b><br>Kategori: ${actor.category}<br>Region: ${actor.region}<br><a href="${actor.link}" target="_blank">Webb</a>`);
 
-          // Hover-effekt
           marker.on('mouseover', function() { this.openPopup(); });
           marker.on('mouseout', function() { this.closePopup(); });
 
@@ -131,22 +131,36 @@
           markerList.push(marker);
         }
       });
+
+      // Lägg till transparenta cirklar för täthet
+      for (var loc in locationCount) {
+        var parts = loc.split(",");
+        var lat = parseFloat(parts[0]);
+        var lng = parseFloat(parts[1]);
+        var count = locationCount[loc];
+        var radius = 200 * count; // storlek baserat på antal aktörer
+        var circle = L.circle([lat,lng], {
+          color: 'gray',
+          fillColor: 'gray',
+          fillOpacity: 0.2,
+          radius: radius
+        });
+        densityCircles.addLayer(circle);
+      }
+
       map.addLayer(markers);
     }
 
     addMarkers("alla","alla","alla");
 
-    // Dynamisk region och aktör dropdown
     function updateDropdowns() {
       var category = document.getElementById("categorySelect").value;
       
-      // Region dropdown
       var regionSelect = document.getElementById("regionSelect");
       var regions = [...new Set(actors.filter(a=>category==="alla"||a.category===category).map(a=>a.region))];
       regionSelect.innerHTML = '<option value="alla">Alla</option>';
       regions.forEach(r => { regionSelect.innerHTML += `<option value="${r}">${r}</option>` });
 
-      // Aktör dropdown
       var actorSelect = document.getElementById("actorSelect");
       var filteredActors = actors.filter(a=>
         (category==="alla" || a.category===category) &&
@@ -179,7 +193,6 @@
       }
     });
 
-    // Legend
     var legend = L.control({position: 'bottomright'});
     legend.onAdd = function(map){
       var div = L.DomUtil.create('div','legend');
@@ -190,6 +203,7 @@
       return div;
     }
     legend.addTo(map);
+
   </script>
 </body>
 </html>
