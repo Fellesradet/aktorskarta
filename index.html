@@ -1,77 +1,75 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aktörskarta & Lista</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>
-body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-h1 { text-align: center; margin: 10px 0; }
-.container { display: flex; flex-wrap: wrap; }
-#table-container { flex: 1 1 50%; padding: 10px; min-width: 300px; }
-#map { flex: 1 1 50%; height: 80vh; min-width: 300px; }
-.legend { margin: 10px; padding: 10px; border: 1px solid #ddd; background: #f9f9f9; }
-.legend div { margin: 3px 0; }
-.color-box { display: inline-block; width: 12px; height: 12px; margin-right: 5px; }
-@media (max-width: 800px) {
-.container { flex-direction: column; }
-#map { height: 50vh; }
-}
-</style>
+  <meta charset="utf-8" />
+  <title>Interaktiv karta med filter</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    #map { height: 90vh; width: 100%; }
+    .buttons {
+      margin: 10px;
+    }
+    .buttons button {
+      margin-right: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-<h1>Aktörskarta & Lista</h1>
-<div class="container">
-<div id="table-container">
-<table id="actorsTable" class="display">
-<thead>
-<tr>
-<th>Kategori</th>
-<th>Organisation</th>
-<th>Region</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
-<div id="map"></div>
-</div>
-<div class="legend">
-<h3>Legend</h3>
-<div><span class="color-box" style="background:red"></span> Näringsliv</div>
-<div><span class="color-box" style="background:blue"></span> Offentlig sektor</div>
-<div><span class="color-box" style="background:gold"></span> Universitet/Forskning</div>
-<div><span class="color-box" style="background:green"></span> Samarbete/Nätverk</div>
-<div><span class="color-box" style="background:orange"></span> Kultur</div>
-<div><span class="color-box" style="background:purple"></span> Sport</div>
-</div>
+  <h2>Interaktiv karta över organisationer med filter</h2>
+  <div class="buttons">
+    <button onclick="filterCategory('Alla')">Alla</button>
+    <button onclick="filterCategory('Näringsliv')">Näringsliv</button>
+    <button onclick="filterCategory('Offentlig sektor')">Offentlig sektor</button>
+    <button onclick="filterCategory('Utbildning')">Utbildning</button>
+    <button onclick="filterCategory('Samarbeten')">Samarbeten</button>
+    <button onclick="filterCategory('Finansiering')">Finansiering</button>
+  </div>
+  <div id="map"></div>
 
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([63.0, 12.0], 6);
 
-<script>
-const actors = [
-{category: "Näringsliv", name: "Samling Näringsliv", region: "Jämtland", lat: 63.17917, lon: 14.63583, color: "red"},
-{category: "Näringsliv", name: "IUC Jämtland Härjedalen", region: "Jämtland", lat: 63.17917, lon: 14.63583, color: "red"},
-{category: "Offentlig sektor", name: "Region Jämtland Härjedalen", region: "Jämtland", lat: 63.1767, lon: 14.6361, color: "blue"},
-{category: "Universitet/Forskning", name: "Mittuniversitetet", region: "Jämtland", lat: 63.1792, lon: 14.644, color: "gold"},
-{category: "Samarbete/Nätverk", name: "Fellesrådet Trøndelag JH", region: "Trøndelag/JH", lat: 63.0, lon: 11.0, color: "green"},
-{category: "Kultur", name: "Gaaltije – sydsamiskt kulturcentrum", region: "Jämtland", lat: 63.318, lon: 13.829, color: "orange"},
-{category: "Sport", name: "Östersunds FK", region: "Jämtland", lat: 63.179, lon: 14.65, color: "purple"}
-];
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
 
+    const data = [
+      {kategori:"Näringsliv", org:"Samling Näringsliv", lat:63.17917, lon:14.63583, färg:"red"},
+      {kategori:"Näringsliv", org:"IUC Jämtland Härjedalen", lat:63.17917, lon:14.63583, färg:"red"},
+      {kategori:"Näringsliv", org:"Handelskammaren Mitt", lat:63.17917, lon:14.63583, färg:"red"},
+      {kategori:"Näringsliv", org:"Företagarna", lat:63.17917, lon:14.63583, färg:"red"},
+      {kategori:"Offentlig sektor", org:"Statsforvalteren", lat:63.44683, lon:10.42191, färg:"blue"},
+      {kategori:"Utbildning", org:"Mittuniversitetet (MIUN)", lat:63.17917, lon:14.63583, färg:"yellow"},
+      {kategori:"Samarbeten", org:"Gränsräddningsrådet Nordred", lat:59.3293, lon:18.0686, färg:"green"},
+      {kategori:"Finansiering", org:"Interreg Sverige Norge Nordens gröna bälte", lat:63.17917, lon:14.63583, färg:"purple"}
+      // ... Lägg till alla dina övriga datapunkter här
+    ];
 
-// Fyll tabell
-const tableBody = document.querySelector('#actorsTable tbody');
-actors.forEach(a => {
-tableBody.innerHTML += `<tr data-lat="${a.lat}" data-lon="${a.lon}"><td style="color:${a.color}">${a.category}</td><td>${a.name}</td><td>${a.region}</td></tr>`;
-});
+    // Skapa markerobjekt för varje datapunkt
+    const markers = data.map(d => {
+      const marker = L.circleMarker([d.lat, d.lon], {
+        color: d.färg,
+        radius: 7,
+        fillOpacity: 0.8
+      }).bindPopup(`<b>${d.org}</b><br>Kategori: ${d.kategori}`);
+      marker.addTo(map);
+      marker.kategori = d.kategori; // lägg till kategori-egenskap
+      return marker;
+    });
 
-
-$(document).ready(function(){
-const dataTable = $('#actorsTable').DataTable();
-$('#actorsTable tbody').on('click', 'tr', function() {
-const lat = this.dataset.lat, lon = this.dataset.lon;
+    // Funktion för filter
+    function filterCategory(category) {
+      markers.forEach(m => {
+        if(category === 'Alla' || m.kategori === category) {
+          map.addLayer(m);
+        } else {
+          map.removeLayer(m);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
