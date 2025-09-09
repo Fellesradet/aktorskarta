@@ -1,120 +1,111 @@
 <!DOCTYPE html>
-<html>
+<html lang="sv">
 <head>
-  <meta charset="utf-8">
-  <title>Aktörskarta Jämtland-Härjedalen & Trøndelag</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <meta charset="UTF-8">
+  <title>Aktörskarta Fellesrådet</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     #map { height: 90vh; width: 100%; }
-    #controls { margin: 10px; }
-    select { padding:5px; margin-right:10px; }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    .controls { padding: 10px; background: #f8f8f8; }
+    select { margin-right: 10px; }
   </style>
 </head>
 <body>
+  <div class="controls">
+    <label>Kategori: 
+      <select id="categoryFilter">
+        <option value="all">Alla</option>
+        <option value="Näringslivsorganisationer">Näringslivsorganisationer</option>
+        <option value="Offentliga aktörer">Offentliga aktörer</option>
+        <option value="Universitet">Universitet och forskning</option>
+        <option value="Civilsamhälle & Kultur">Civilsamhälle & Kultur</option>
+        <option value="Finansiering">Finansiering</option>
+        <option value="Nätverk">Nätverk</option>
+        <option value="Kulturevent">Kulturevent</option>
+        <option value="Sportevent">Sportevent</option>
+    </select>
+    </label>
+    
+    <label>Ort: 
+      <select id="cityFilter">
+        <option value="all">Alla</option>
+      </select>
+    </label>
+  </div>
 
-<h2>Aktörskarta Jämtland-Härjedalen & Trøndelag</h2>
-<div id="controls">
-  Kategori:
-  <select id="categoryFilter">
-    <option value="all">Alla</option>
-  </select>
-  Ort:
-  <select id="cityFilter">
-    <option value="all">Alla</option>
-  </select>
-</div>
-<div id="map"></div>
+  <div id="map"></div>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-// Skapa kartan
-var map = L.map('map').setView([63.5, 13.5], 6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([63.0, 12.0], 6); // Centrerar mellan JH och Trøndelag
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-// Färg per kategori
-var colors = {
-  "Näringsliv":"blue",
-  "Offentliga aktörer":"red",
-  "Universitet/forskning":"green",
-  "Kultur":"orange",
-  "Sport":"purple",
-  "Finansiering":"brown",
-  "Nätverk":"pink",
-  "Gränsöverskridande":"teal",
-  "Event":"cyan",
-  "Företag":"gray"
-};
+    // Lista på aktörer (exempel, du kan fylla på alla 235)
+    const actors = [
+      {name: "Samling Näringsliv", category: "Näringslivsorganisationer", city: "Östersund", lat: 63.1792, lon: 14.6351},
+      {name: "IUC Jämtland Härjedalen", category: "Näringslivsorganisationer", city: "Östersund", lat: 63.1792, lon: 14.6351},
+      {name: "Handelskammaren Mitt", category: "Näringslivsorganisationer", city: "Östersund", lat: 63.1792, lon: 14.6351},
+      {name: "NHO Næringslivets Hovedorganisasjon", category: "Näringslivsorganisationer", city: "Trondheim", lat: 63.4305, lon: 10.3951},
+      {name: "Polisen", category: "Offentliga aktörer", city: "Östersund", lat: 63.1792, lon: 14.6351},
+      {name: "Mittuniversitetet (MIUN)", category: "Universitet", city: "Östersund", lat: 63.1792, lon: 14.6351},
+      {name: "Jamtli Vårmarknad", category: "Kulturevent", city: "Östersund", lat: 63.1792, lon: 14.6351},
+      // Fyll på alla övriga aktörer med korrekta koordinater
+    ];
 
-// Aktörer med ort och kategori (ungefärliga lat/lon)
-var actors = [
-  // --- Här lägger vi in alla 235 aktörer med lat/lon ---
-  {name:"Samling Näringsliv", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
-  {name:"IUC Jämtland Härjedalen", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
-  {name:"Handelskammaren Mitt", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
-  {name:"Företagarna", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
-  {name:"Jämtland Härjedalen Turism (JHT)", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
-  {name:"Svenskt Näringsliv Jämtland", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
-  {name:"Nyföretagarcentrum", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
-  {name:"Lantbrukarnas riksorganisation (LRF)", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
-  {name:"Peak Inkubator", city:"Östersund", category:"Näringsliv", lat:63.179, lon:14.635},
-  {name:"NHO Næringslivets Hovedorganisasjon", city:"Trondheim", category:"Näringsliv", lat:63.4305, lon:10.3951},
-  {name:"Næringsforeningen i Trondheimsregionen (NiT)", city:"Trondheim", category:"Näringsliv", lat:63.4305, lon:10.3951},
-  {name:"Innherred Næringsforening", city:"Steinkjer", category:"Näringsliv", lat:64.017, lon:11.500},
-  {name:"Rørosregionen Næringshage", city:"Røros", category:"Näringsliv", lat:62.574, lon:11.384},
-  {name:"Nasjonalparken Næringshage", city:"Røros", category:"Näringsliv", lat:62.574, lon:11.384},
-  {name:"FI Næringshage", city:"Steinkjer", category:"Näringsliv", lat:64.017, lon:11.500},
-  {name:"Tindved Kulturhage", city:"Steinkjer", category:"Näringsliv", lat:64.017, lon:11.500},
-  {name:"Næringshagen Hitra og Frøya", city:"Hitra", category:"Näringsliv", lat:63.528, lon:9.377},
-  {name:"Blått Kompetansesenter AS", city:"Trondheim", category:"Näringsliv", lat:63.4305, lon:10.3951},
-  {name:"Statsforvalteren", city:"Trondheim", category:"Offentliga aktörer", lat:63.4305, lon:10.3951},
-  {name:"Länsstyrelsen", city:"Östersund", category:"Offentliga aktörer", lat:63.176, lon:14.635},
-  {name:"Arbetsförmedlingen", city:"Östersund", category:"Offentliga aktörer", lat:63.176, lon:14.635},
-  {name:"Mittuniversitetet (MIUN)", city:"Östersund", category:"Universitet/forskning", lat:63.179, lon:14.635},
-  {name:"Trøndelag Teater", city:"Trondheim", category:"Kultur", lat:63.429, lon:10.392},
-  {name:"Storsjöcupen", city:"Östersund", category:"Sport", lat:63.179, lon:14.635}
-  // Fortsätt med alla resterande aktörer...
-];
+    // Lägg till prickar
+    const markers = actors.map(actor => {
+      const marker = L.circleMarker([actor.lat, actor.lon], {
+        radius: 6,
+        color: getCategoryColor(actor.category),
+        fillOpacity: 0.8
+      }).bindPopup(`<b>${actor.name}</b><br>${actor.category}<br>${actor.city}`);
+      marker.addTo(map);
+      return {...actor, marker};
+    });
 
-// Skapa markers
-var markers = [];
-actors.forEach(function(a){
-  var marker = L.circleMarker([a.lat, a.lon], {
-    radius:6,
-    color: colors[a.category] || "black",
-    fillOpacity:0.8
-  }).bindPopup(a.name + " ("+a.city+")").addTo(map);
-  marker.actor = a;
-  markers.push(marker);
-});
+    // Fyll ort-filter
+    const citySelect = document.getElementById('cityFilter');
+    const cities = [...new Set(actors.map(a => a.city))].sort();
+    cities.forEach(c => {
+      const option = document.createElement('option');
+      option.value = c;
+      option.textContent = c;
+      citySelect.appendChild(option);
+    });
 
-// Fyll dropdowns
-var categories = Array.from(new Set(actors.map(a=>a.category)));
-var categorySelect = document.getElementById("categoryFilter");
-categories.forEach(c=>{
-  var opt = document.createElement("option"); opt.value=c; opt.textContent=c;
-  categorySelect.appendChild(opt);
-});
+    // Filterfunktion
+    document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+    document.getElementById('cityFilter').addEventListener('change', applyFilters);
 
-var cities = Array.from(new Set(actors.map(a=>a.city)));
-var citySelect = document.getElementById("cityFilter");
-cities.forEach(c=>{
-  var opt = document.createElement("option"); opt.value=c; opt.textContent=c;
-  citySelect.appendChild(opt);
-});
+    function applyFilters() {
+      const selectedCategory = document.getElementById('categoryFilter').value;
+      const selectedCity = document.getElementById('cityFilter').value;
+      markers.forEach(a => {
+        if ((selectedCategory === 'all' || a.category === selectedCategory) &&
+            (selectedCity === 'all' || a.city === selectedCity)) {
+          a.marker.addTo(map);
+        } else {
+          map.removeLayer(a.marker);
+        }
+      });
+    }
 
-// Filterfunktion
-function updateMarkers(){
-  var cat = categorySelect.value;
-  var city = citySelect.value;
-  markers.forEach(m=>{
-    var show = (cat==="all" || m.actor.category===cat) && (city==="all" || m.actor.city===city);
-    m.setStyle({opacity: show?1:0, fillOpacity: show?0.8:0});
-    if(show) m.bringToFront();
-  });
-}
-categorySelect.addEventListener("change", updateMarkers);
-citySelect.addEventListener("change", updateMarkers);
-</script>
-
+    function getCategoryColor(category) {
+      switch(category) {
+        case "Näringslivsorganisationer": return "blue";
+        case "Offentliga aktörer": return "red";
+        case "Universitet": return "green";
+        case "Civilsamhälle & Kultur": return "purple";
+        case "Finansiering": return "orange";
+        case "Nätverk": return "brown";
+        case "Kulturevent": return "pink";
+        case "Sportevent": return "cyan";
+        default: return "gray";
+      }
+    }
+  </script>
 </body>
 </html>
