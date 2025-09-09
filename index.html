@@ -5,133 +5,112 @@
   <title>Aktörskarta Tröndelag & Jämtland Härjedalen</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
-    body { margin:0; font-family: Arial, sans-serif; }
-    #map { height: 100vh; width: 70%; float: right; }
-    #sidebar { width: 30%; float: left; height: 100vh; overflow-y: scroll; padding: 10px; box-sizing: border-box; background: #f5f5f5; }
-    h2 { margin-top: 20px; }
-    .category { margin-bottom: 5px; }
-    .aktor { margin-left: 15px; }
-    select { width: 100%; margin-bottom: 10px; }
+    body { margin:0; font-family:sans-serif; display:flex; height:100vh; }
+    #sidebar { width:30%; overflow-y:auto; padding:10px; background:#f5f5f5; }
+    #map { flex:1; }
+    h2 { margin:10px 0; }
+    .category, .aktor { margin:5px 0; }
+    select { width:100%; }
+    .legend { background:white; padding:5px; line-height:1.4; }
+    .legend-color-box { width:18px; height:18px; display:inline-block; margin-right:5px; vertical-align:middle; }
   </style>
 </head>
 <body>
   <div id="sidebar">
     <h2>Kategorier</h2>
     <div id="category-list"></div>
-
     <h2>Filter på ort</h2>
-    <select id="ort-filter">
-      <option value="">Visa alla orter</option>
-    </select>
-
+    <select id="ort-filter"><option value="">Alla orter</option></select>
     <h2>Aktörer</h2>
     <div id="aktor-list"></div>
   </div>
-
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    // Här definierar vi aktörer med kategori, namn, ort och koordinater
-    const aktorer = [
-      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Samling Näringsliv", ort: "Östersund", coords: [63.1792, 14.6357]},
-      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "IUC Jämtland Härjedalen", ort: "Östersund", coords: [63.1792, 14.6357]},
-      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Handelskammaren Mitt", ort: "Östersund", coords: [63.1792, 14.6357]},
-      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Företagarna", ort: "Östersund", coords: [63.1792, 14.6357]},
-      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Jämtland Härjedalen Turism (JHT)", ort: "Östersund", coords: [63.1792, 14.6357]},
-      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Svenskt Näringsliv Jämtland", ort: "Östersund", coords: [63.1792, 14.6357]},
-      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Nyföretagarcentrum", ort: "Östersund", coords: [63.1792, 14.6357]},
-      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Lantbrukarnas riksorganisation (LRF)", ort: "Östersund", coords: [63.1792, 14.6357]},
-      {kategori: "Näringslivsorganisationer - Jämtland Härjedalen", namn: "Peak Inkubator", ort: "Östersund", coords: [63.1792, 14.6357]},
+    // GeoJSON för Jämtland/Härjedalen och Trøndelag (förenklade)
+    const geoJamtland = {
+      "type":"Feature", "properties":{}, "geometry":{
+        "type":"Polygon", "coordinates":[[
+          [14.0,62.2],[14.0,64.0],[15.0,64.0],[15.0,62.2],[14.0,62.2]
+        ]]
+      }
+    };
+    const geoTrondelag = {
+      "type":"Feature", "properties":{}, "geometry":{
+        "type":"Polygon", "coordinates":[[
+          [9.0,63.0],[9.0,64.5],[11.0,64.5],[11.0,63.0],[9.0,63.0]
+        ]]
+      }
+    };
 
-      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "NHO Næringslivets Hovedorganisasjon", ort: "Trondheim", coords: [63.4305, 10.3951]},
-      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Næringsforeningen i Trondheimsregionen (NiT)", ort: "Trondheim", coords: [63.4305, 10.3951]},
-      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Innherred Næringsforening", ort: "Steinkjer", coords: [64.0143, 11.4962]},
-      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Rørosregionen Næringshage", ort: "Røros", coords: [62.5742, 11.3875]},
-      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Nasjonalparken Næringshage", ort: "Røros", coords: [62.5742, 11.3875]},
-      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "FI Næringshage", ort: "Steinkjer", coords: [64.0143, 11.4962]},
-      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Tindved Kulturhage", ort: "Steinkjer", coords: [64.0143, 11.4962]},
-      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Næringshagen Hitra og Frøya", ort: "Hitra", coords: [63.4621, 9.6987]},
-      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Blått Kompetansesenter AS", ort: "Trondheim", coords: [63.4305, 10.3951]},
-      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "INAM AS (Innovasjon Namdal)", ort: "Namsos", coords: [64.4641, 11.5007]},
-      {kategori: "Näringslivsorganisationer - Tröndelag", namn: "Thams Innovasjon AS", ort: "Trondheim", coords: [63.4305, 10.3951]},
-      // ... fortsätt med alla aktörer på samma sätt
+    // Data: kategori, namn, ort, coords
+    const aktorer = [
+      {kategori:"Näringslivsorganisationer - Jämtland Härjedalen",namn:"Samling Näringsliv",ort:"Östersund",coords:[63.1792,14.6357]},
+      {kategori:"Offentliga aktörer - Jämtland Härjedalen",namn:"Polisen",ort:"Östersund",coords:[63.1792,14.6357]},
+      {kategori:"Näringslivsorganisationer - Tröndelag",namn:"NHO Næringslivets Hovedorganisasjon",ort:"Trondheim",coords:[63.4305,10.3951]},
+      {kategori:"Offentliga aktörer - Tröndelag",namn:"Statsforvalteren",ort:"Trondheim",coords:[63.4305,10.3951]},
+      // Fyll på här med resten av aktörerna från din lista...
     ];
 
-    // Skapa kartan
     const map = L.map('map').setView([63.5, 12.0], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:18, attribution:'© OpenStreetMap' }).addTo(map);
 
-    // Skapa LayerGroups per kategori
+    // Lägg till gränspolygoner
+    L.geoJSON(geoJamtland, {style:{color:'#0055A4',weight:3,fillColor:'#0055A4',fillOpacity:0.1}}).addTo(map);
+    L.geoJSON(geoTrondelag, {style:{color:'#3C763D',weight:3,fillColor:'#3C763D',fillOpacity:0.1}}).addTo(map);
+
+    // Legend
+    const legend = L.control({position:'topright'});
+    legend.onAdd = function(){
+      const div = L.DomUtil.create('div','legend');
+      div.innerHTML = '<div><span class="legend-color-box" style="background:#0055A4;"></span>Jämtland/Härjedalen</div>'
+                    + '<div><span class="legend-color-box" style="background:#3C763D;"></span>Trøndelag</div>';
+      return div;
+    };
+    legend.addTo(map);
+
     const categoryLayers = {};
     aktorer.forEach(a => {
       if(!categoryLayers[a.kategori]) categoryLayers[a.kategori] = L.layerGroup();
       const marker = L.marker(a.coords).bindPopup(`<b>${a.namn}</b><br>${a.ort}`);
-      marker.aktorData = a; // spara referens för filtrering
       marker.addTo(categoryLayers[a.kategori]);
     });
 
-    // Lista kategorier med kryssrutor
-    const container = document.getElementById('category-list');
+    const catContainer = document.getElementById('category-list');
     Object.keys(categoryLayers).forEach(cat => {
-      const div = document.createElement('div');
-      div.className = 'category';
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.id = cat;
-      checkbox.addEventListener('change', e => updateMapAndList());
-      const label = document.createElement('label');
-      label.htmlFor = cat;
-      label.innerText = cat;
-      div.appendChild(checkbox);
-      div.appendChild(label);
-      container.appendChild(div);
+      const div = document.createElement('div'); div.className='category';
+      const cb = document.createElement('input'); cb.type='checkbox'; cb.id=cat;
+      cb.addEventListener('change', updateDisplay);
+      const lbl = document.createElement('label'); lbl.htmlFor=cat; lbl.innerText=cat;
+      div.append(cb,lbl);
+      catContainer.appendChild(div);
     });
 
-    // Skapa ort-filter
     const ortFilter = document.getElementById('ort-filter');
-    const orter = [...new Set(aktorer.map(a => a.ort).filter(o => o))].sort();
-    orter.forEach(o => {
-      const opt = document.createElement('option');
-      opt.value = o;
-      opt.innerText = o;
+    [...new Set(aktorer.map(a=>a.ort))].sort().forEach(o => {
+      const opt = document.createElement('option'); opt.value=o; opt.innerText=o;
       ortFilter.appendChild(opt);
     });
-    ortFilter.addEventListener('change', updateMapAndList);
+    ortFilter.addEventListener('change',updateDisplay);
 
-    const listContainer = document.getElementById('aktor-list');
+    const listDiv = document.getElementById('aktor-list');
+    function updateDisplay(){
+      Object.values(categoryLayers).forEach(l=>l.remove());
+      listDiv.innerHTML='';
 
-    function updateMapAndList() {
-      // Ta bort alla lager
-      Object.values(categoryLayers).forEach(layer => layer.remove());
-
-      // Bestäm valda kategorier
-      const selectedCategories = Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.id);
-      const selectedOrt = ortFilter.value;
-
-      listContainer.innerHTML = '';
+      const selectedCats = [...catContainer.querySelectorAll('input:checked')].map(cb=>cb.id);
+      const selOrt = ortFilter.value;
 
       aktorer.forEach(a => {
-        const show = selectedCategories.includes(a.kategori) && (!selectedOrt || a.ort === selectedOrt);
-        if(show) {
-          // Lägg till i lista
-          const div = document.createElement('div');
-          div.className = 'aktor';
+        if(selectedCats.includes(a.kategori) && (!selOrt || a.ort===selOrt)) {
+          const div = document.createElement('div'); div.className='aktor';
           div.innerText = `${a.namn} (${a.ort})`;
-          listContainer.appendChild(div);
-          // Lägg till på karta
-          const marker = L.marker(a.coords).bindPopup(`<b>${a.namn}</b><br>${a.ort}`);
-          marker.addTo(categoryLayers[a.kategori]);
+          listDiv.appendChild(div);
+          categoryLayers[a.kategori].addTo(map);
         }
       });
-
-      // Lägg till valda lager på kartan
-      selectedCategories.forEach(cat => categoryLayers[cat].addTo(map));
     }
-
   </script>
 </body>
 </html>
