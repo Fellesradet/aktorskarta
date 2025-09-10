@@ -1,164 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="sv">
 <head>
-  <meta charset="utf-8" />
-  <title>Interaktiv karta - Organisationer</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <style>
-    #map { height: 70vh; width: 100%; }
-    #controls { margin: 10px; }
-    #list { max-height: 200px; overflow-y: auto; margin-top: 10px; }
-    .category-button {
-      padding: 5px 10px;
-      margin: 2px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      color: white;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organisationer Karta</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; display: flex; height: 100vh; }
+  #sidebar { width: 300px; overflow-y: auto; border-right: 1px solid #ccc; padding: 10px; }
+  #map { flex: 1; }
+  .org-item { padding: 5px; cursor: pointer; }
+  .org-item:hover { background-color: #f0f0f0; }
+  .filter-btn { margin: 2px; padding: 5px 10px; cursor: pointer; border: 1px solid #ccc; border-radius: 4px; }
+  .filter-btn.active { background-color: #ddd; }
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
-  <h2>Interaktiv karta över organisationer</h2>
-  <div id="controls"></div>
-  <div id="map"></div>
-  <div id="list"></div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script>
-    const map = L.map('map').setView([63.0, 12.0], 6);
+<div id="sidebar">
+  <div id="filter-buttons"></div>
+  <div id="org-list"></div>
+</div>
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
+<div id="map"></div>
 
-    const data = [
-      {kategori:"Näringsliv", org:"Samling Näringsliv", lat:63.17917, lon:14.63583, färg:"red"},
-      {kategori:"Näringsliv", org:"IUC Jämtland Härjedalen", lat:63.17917, lon:14.63583, färg:"red"},
-      {kategori:"Näringsliv", org:"Handelskammaren Mitt", lat:63.17917, lon:14.63583, färg:"red"},
-      {kategori:"Näringsliv", org:"Företagarna", lat:63.17917, lon:14.63583, färg:"red"},
-      {kategori:"Näringsliv", org:"Jämtland Härjedalen Turism (JHT)", lat:63.17917, lon:14.63583, färg:"red"},
-      {kategori:"Näringsliv", org:"Svenskt Näringsliv Jämtland", lat:63.17917, lon:14.63583, färg:"red"},
-      {kategori:"Näringsliv", org:"Nyföretagarcentrum", lat:63.17917, lon:14.63583, färg:"red"},
-      {kategori:"Näringsliv", org:"Lantbrukarnas riksorganisation (LRF)", lat:63.17917, lon:14.63583, färg:"red"},
-      {kategori:"Näringsliv", org:"Peak Inkubator", lat:63.17917, lon:14.63583, färg:"red"},
-      {kategori:"Näringsliv", org:"NHO Næringslivets Hovedorganisasjon", lat:63.44683, lon:10.42191, färg:"red"},
-      {kategori:"Näringsliv", org:"Næringsforeningen i Trondheimsregionen (NiT)", lat:63.44683, lon:10.42191, färg:"red"},
-      {kategori:"Näringsliv", org:"Innherred Næringsforening", lat:64.01519, lon:11.49526, färg:"red"},
-      {kategori:"Näringsliv", org:"Rørosregionen Næringshage", lat:62.5747, lon:11.3842, färg:"red"},
-      {kategori:"Näringsliv", org:"Nasjonalparken Næringshage", lat:62.5747, lon:11.3842, färg:"red"},
-      {kategori:"Näringsliv", org:"FI Næringshage", lat:64.01519, lon:11.49526, färg:"red"},
-      {kategori:"Näringsliv", org:"Tindved Kulturhage", lat:64.01519, lon:11.49526, färg:"red"},
-      {kategori:"Näringsliv", org:"Næringshagen Hitra og Frøya", lat:63.5453, lon:8.9320, färg:"red"},
-      {kategori:"Näringsliv", org:"Blått Kompetansesenter AS", lat:63.44683, lon:10.42191, färg:"red"},
-      {kategori:"Näringsliv", org:"INAM AS (Innovasjon Namdal)", lat:64.4662, lon:11.4957, färg:"red"},
-      {kategori:"Näringsliv", org:"Thams Innovasjon AS", lat:63.44683, lon:10.42191, färg:"red"},
-      {kategori:"Näringsliv", org:"Naeringsforeningen i Vaernesregionen", lat:63.4669, lon:11.1863, färg:"red"},
-      {kategori:"Näringsliv", org:"Proneo", lat:64.01519, lon:11.49526, färg:"red"},
-      {kategori:"Näringsliv", org:"Fremtidens Industri AS (FI)", lat:63.44683, lon:10.42191, färg:"red"},
-      {kategori:"Näringsliv", org:"Trøndelag Reiseliv", lat:63.44683, lon:10.42191, färg:"red"},
-      {kategori:"Näringsliv", org:"Nordsec (tidigare Midsec)", lat:63.44683, lon:10.42191, färg:"red"},
-      {kategori:"Näringsliv", org:"Industrinavet i Trøndelag", lat:63.44683, lon:10.42191, färg:"red"},
-      {kategori:"Näringsliv", org:"RENERGY – Renewable Energy Cluster", lat:63.44683, lon:10.42191, färg:"red"},
-      {kategori:"Näringsliv", org:"WoodWorks! Cluster", lat:63.44683, lon:10.42191, färg:"red"},
+<script>
+const orgs = [
+{kategori:"Näringsliv", namn:"Samling Näringsliv", lat:63.17917, lon:14.63583, färg:"Röd"},
+{kategori:"Näringsliv", namn:"IUC Jämtland Härjedalen", lat:63.17917, lon:14.63583, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Handelskammaren Mitt", lat:63.17917, lon:14.63583, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Företagarna", lat:63.17917, lon:14.63583, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Jämtland Härjedalen Turism (JHT)", lat:63.17917, lon:14.63583, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Svenskt Näringsliv Jämtland", lat:63.17917, lon:14.63583, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Nyföretagarcentrum", lat:63.17917, lon:14.63583, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Lantbrukarnas riksorganisation (LRF)", lat:63.17917, lon:14.63583, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Peak Inkubator", lat:63.17917, lon:14.63583, färg:"Röd"},
+{kategori:"Näringsliv", namn:"NHO Næringslivets Hovedorganisasjon", lat:63.44683, lon:10.42191, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Næringsforeningen i Trondheimsregionen (NiT)", lat:63.44683, lon:10.42191, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Innherred Næringsforening", lat:64.01519, lon:11.49526, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Rørosregionen Næringshage", lat:62.5747, lon:11.3842, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Nasjonalparken Næringshage", lat:62.5747, lon:11.3842, färg:"Röd"},
+{kategori:"Näringsliv", namn:"FI Næringshage", lat:64.01519, lon:11.49526, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Tindved Kulturhage", lat:64.01519, lon:11.49526, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Næringshagen Hitra og Frøya", lat:63.5453, lon:8.9320, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Blått Kompetansesenter AS", lat:63.44683, lon:10.42191, färg:"Röd"},
+{kategori:"Näringsliv", namn:"INAM AS (Innovasjon Namdal)", lat:64.4662, lon:11.4957, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Thams Innovasjon AS", lat:63.44683, lon:10.42191, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Naeringsforeningen i Vaernesregionen", lat:63.4669, lon:11.1863, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Proneo", lat:64.01519, lon:11.49526, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Fremtidens Industri AS (FI)", lat:63.44683, lon:10.42191, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Trøndelag Reiseliv", lat:63.44683, lon:10.42191, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Nordsec (tidigare Midsec)", lat:63.44683, lon:10.42191, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Industrinavet i Trøndelag", lat:63.44683, lon:10.42191, färg:"Röd"},
+{kategori:"Näringsliv", namn:"RENERGY – Renewable Energy Cluster", lat:63.44683, lon:10.42191, färg:"Röd"},
+{kategori:"Näringsliv", namn:"WoodWorks! Cluster", lat:63.44683, lon:10.42191, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Uniper", lat:63.17917, lon:14.63583, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Aneo", lat:63.44683, lon:10.42191, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Ritek", lat:63.7464, lon:11.2941, färg:"Röd"},
+{kategori:"Näringsliv", namn:"Persson Invest", lat:63.17917, lon:14.63583, färg:"Röd"},
+{kategori:"Offentlig sektor", namn:"Statsforvalteren", lat:63.44683, lon:10.42191, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Helse Midt-Norge RHF", lat:64.01519, lon:11.49526, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Statens vägvesende", lat:63.44683, lon:10.42191, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Politi", lat:63.44683, lon:10.42191, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Tolletaten", lat:63.44683, lon:10.42191, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"NAV", lat:63.44683, lon:10.42191, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Försvarskoordinatorn Trøndelag", lat:63.44683, lon:10.42191, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Kommunförbundet Trøndelag", lat:63.44683, lon:10.42191, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Skatteetaten", lat:63.44683, lon:10.42191, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Länsstyrelsen", lat:63.17917, lon:14.63583, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Arbetsförmedlingen", lat:63.17917, lon:14.63583, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Polisen", lat:63.17917, lon:14.63583, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Försäkringskassan", lat:63.17917, lon:14.63583, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Tullverket", lat:63.17917, lon:14.63583, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Skatteverket", lat:63.17917, lon:14.63583, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Almi", lat:63.17917, lon:14.63583, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Kommunförbundet JH", lat:63.17917, lon:14.63583, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Sametinget", lat:63.17917, lon:14.63583, färg:"Blå"},
+{kategori:"Offentlig sektor", namn:"Samverket/Myndighetsnätverket", lat:63.17917, lon:14.63583, färg:"Blå"},
+{kategori:"Utbildning", namn:"Mittuniversitetet (MIUN)", lat:63.17917, lon:14.63583, färg:"Gul"},
+{kategori:"Utbildning", namn:"Hushållningssällskapet", lat:63.17917, lon:14.63583, färg:"Gul"},
+{kategori:"Utbildning", namn:"Torsta AB", lat:63.0000, lon:14.5000, färg:"Gul"},
+{kategori:"Utbildning", namn:"Norwegian University of Science and Technology NTNU", lat:63.44683, lon:10.42191, färg:"Gul"},
+{kategori:"Utbildning", namn:"NTNU:s Næringslivsringer", lat:63.44683, lon:10.42191, färg:"Gul"},
+{kategori:"Utbildning", namn:"Dronning Mauds Minne Høgskole DMMH", lat:63.44683, lon:10.42191, färg:"Gul"},
+{kategori:"Utbildning", namn:"Nord universitet (Campus Levanger, Steinkjer och Namsos)", lat:63.7464, lon:11.2941, färg:"Gul"},
+{kategori:"Utbildning", namn:"Sintef", lat:63.44683, lon:10.42191, färg:"Gul"},
+{kategori:"Utbildning", namn:"Falstadsenteret", lat:63.6500, lon:11.2833, färg:"Gul"}
+];
 
-      {kategori:"Offentlig sektor", org:"Statsforvalteren", lat:63.44683, lon:10.42191, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Helse Midt-Norge RHF", lat:64.01519, lon:11.49526, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Statens vägvesende", lat:63.44683, lon:10.42191, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Politi", lat:63.44683, lon:10.42191, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Tolletaten", lat:63.44683, lon:10.42191, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"NAV", lat:63.44683, lon:10.42191, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Försvarskoordinatorn Trøndelag", lat:63.44683, lon:10.42191, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Kommunförbundet Trøndelag", lat:63.44683, lon:10.42191, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Skatteetaten", lat:63.44683, lon:10.42191, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Länsstyrelsen", lat:63.17917, lon:14.63583, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Arbetsförmedlingen", lat:63.17917, lon:14.63583, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Polisen", lat:63.17917, lon:14.63583, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Försäkringskassan", lat:63.17917, lon:14.63583, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Tullverket", lat:63.17917, lon:14.63583, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Skatteverket", lat:63.17917, lon:14.63583, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Almi", lat:63.17917, lon:14.63583, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Kommunförbundet JH", lat:63.17917, lon:14.63583, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Sametinget", lat:63.17917, lon:14.63583, färg:"blue"},
-      {kategori:"Offentlig sektor", org:"Samverket/Myndighetsnätverket", lat:63.17917, lon:14.63583, färg:"blue"},
+const map = L.map('map').setView([63.17917, 14.63583], 6);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+}).addTo(map);
 
-      {kategori:"Utbildning", org:"Mittuniversitetet (MIUN)", lat:63.17917, lon:14.63583, färg:"yellow"},
-      {kategori:"Utbildning", org:"Hushållningssällskapet", lat:63.17917, lon:14.63583, färg:"yellow"},
-      {kategori:"Utbildning", org:"Torsta AB", lat:63.0000, lon:14.5000, färg:"yellow"},
-      {kategori:"Utbildning", org:"Norwegian University of Science and Technology NTNU", lat:63.44683, lon:10.42191, färg:"yellow"},
-      {kategori:"Utbildning", org:"NTNU:s Næringslivsringer", lat:63.44683, lon:10.42191, färg:"yellow"},
-      {kategori:"Utbildning", org:"Dronning Mauds Minne Høgskole DMMH", lat:63.44683, lon:10.42191, färg:"yellow"},
-      {kategori:"Utbildning", org:"Nord universitet (Campus Levanger, Steinkjer och Namsos)", lat:63.7464, lon:11.2941, färg:"yellow"},
-      {kategori:"Utbildning", org:"Sintef", lat:63.44683, lon:10.42191, färg:"yellow"},
-      {kategori:"Utbildning", org:"Falstadsenteret", lat:63.6500, lon:11.2833, färg:"yellow"},
+const markerLayer = L.layerGroup().addTo(map);
 
-      {kategori:"Samarbeten", org:"Gränsräddningsrådet Nordred", lat:59.3293, lon:18.0686, färg:"green"},
-      {kategori:"Samarbeten", org:"Samarbete mellan polisen", lat:61.8230, lon:12.0380, färg:"green"},
-      {kategori:"Samarbeten", org:"Tullsamarbete (Storlien och Vauldalen)", lat:63.3300, lon:12.1167, färg:"green"},
-      {kategori:"Samarbeten", org:"Platform North", lat:63.17917, lon:14.63583, färg:"green"},
-      {kategori:"Samarbeten", org:"Atlantbanan", lat:63.44683, lon:10.42191, färg:"green"},
-      {kategori:"Samarbeten", org:"Föreningen Norden i Östersund", lat:63.17917, lon:14.63583, färg:"green"},
-      {kategori:"Samarbeten", org:"Föreningen Norden i Trondheim", lat:63.44683, lon:10.42191, färg:"green"},
+const categories = [...new Set(orgs.map(o=>o.kategori))];
+categories.unshift("Alla");
 
-      {kategori:"Finansiering", org:"Interreg Sverige Norge Nordens gröna bälte", lat:63.17917, lon:14.63583, färg:"purple"},
-      {kategori:"Finansiering", org:"Interreg Aurora", lat:65.5848, lon:22.1567, färg:"purple"},
-      {kategori:"Finansiering", org:"Innovation Norge", lat:63.44683, lon:10.42191, färg:"purple"},
-      {kategori:"Finansiering", org:"Leader Grogrund", lat:63.3667, lon:14.5833, färg:"purple"},
-      {kategori:"Finansiering", org:"Leader 3Sam", lat:62.8333, lon:15.1667, färg:"purple"}
-    ];
+const filterContainer = document.getElementById("filter-buttons");
+categories.forEach(cat=>{
+  const btn = document.createElement("button");
+  btn.textContent = cat;
+  btn.className = "filter-btn";
+  if(cat==="Alla") btn.classList.add("active");
+  btn.onclick = ()=>{
+    document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    renderList(cat);
+  };
+  filterContainer.appendChild(btn);
+});
 
-    const markers = [];
-    const categories = [...new Set(data.map(d => d.kategori))];
-    const listDiv = document.getElementById('list');
-    const controls = document.getElementById('controls');
+function renderList(category){
+  markerLayer.clearLayers();
+  const list = document.getElementById("org-list");
+  list.innerHTML="";
+  orgs.filter(o=>category==="Alla"||o.kategori===category).forEach(o=>{
+    const div = document.createElement("div");
+    div.className="org-item";
+    div.textContent=o.namn;
+    div.style.borderLeft="5px solid "+o.färg;
+    div.onclick=()=>{
+      map.setView([o.lat,o.lon],12);
+    };
+    list.appendChild(div);
 
-    let activeCategories = new Set(categories);
-    
-    categories.forEach(cat => {
-      const btn = document.createElement('button');
-      btn.textContent = cat;
-      btn.className = "category-button";
-      btn.style.backgroundColor = data.find(d => d.kategori === cat).färg;
-      btn.onclick = () => {
-        if (activeCategories.has(cat)) {
-          activeCategories.delete(cat);
-          btn.style.opacity = 0.5;
-        } else {
-          activeCategories.add(cat);
-          btn.style.opacity = 1;
-        }
-        updateMarkers();
-      };
-      controls.appendChild(btn);
-    });
+    const marker = L.circleMarker([o.lat,o.lon],{radius:8,color:o.färg}).addTo(markerLayer);
+    marker.bindPopup(o.namn);
+  });
+}
 
-    function updateMarkers() {
-      markers.forEach(m => map.removeLayer(m));
-      markers.length = 0;
-      listDiv.innerHTML = '';
-      data.forEach(d => {
-        if (activeCategories.has(d.kategori)) {
-          const marker = L.circleMarker([d.lat, d.lon], {
-            color: d.färg,
-            radius: 7,
-            fillOpacity: 0.8
-          }).bindPopup(`<b>${d.org}</b><br>Kategori: ${d.kategori}`);
-          marker.addTo(map);
-          markers.push(marker);
+renderList("Alla");
+</script>
 
-          const item = document.createElement('div');
-          item.textContent = d.org;
-          item.style.cursor = 'pointer';
-          item.onclick = () => {
-            map.setView([d.lat, d.lon], 10);
-            marker.openPopup();
-          };
-          listDiv.appendChild(item);
-        }
-      });
-    }
-
-    updateMarkers();
-  </script>
 </body>
 </html>
