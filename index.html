@@ -2,104 +2,269 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<title>Aktörskarta</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<title>Aktörskarta Interaktiv</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-body { margin:0; display:flex; height:100vh; font-family: Arial, sans-serif; }
-#sidebar { width: 300px; overflow-y: auto; padding: 10px; border-right: 1px solid #ccc; }
-#map { flex:1; }
-.org-item { padding:5px; cursor:pointer; border-bottom:1px solid #eee; }
-.org-item:hover { background:#f0f0f0; }
-select { width: 100%; margin-bottom: 10px; padding: 5px; }
+body { font-family: Arial, sans-serif; margin:0; padding:0; }
+#container { display: flex; height: 100vh; }
+#list { width: 25%; overflow-y: auto; padding: 10px; border-right: 1px solid #ccc; }
+#map { flex: 1; }
+.org-item { margin: 5px 0; }
 </style>
 </head>
 <body>
-
-
-<div id="sidebar">
-<h3>Organisationer</h3>
-<label for="kategori-filter">Välj kategori:</label>
-<select id="kategori-filter">
+<div id="container">
+<div id="list">
+<h2>Välj kategori</h2>
+<select id="categorySelect">
 <option value="Alla">Alla</option>
+<option value="Näringsliv">Näringsliv</option>
+<option value="Offentlig sektor">Offentlig sektor</option>
+<option value="Utbildning">Utbildning</option>
+<option value="Samarbeten">Samarbeten</option>
+<option value="Finansiering">Finansiering</option>
+<option value="Samarbeten/Nätverk">Samarbeten/Nätverk</option>
+<option value="Kultur">Kultur</option>
+<option value="Sport">Sport</option>
 </select>
-<div id="org-list"></div>
+<div id="orgList"></div>
+</div>
+<div id="map"></div>
 </div>
 
 
-<div id="map"></div>
-
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const organizations = [
-{kategori:"Näringsliv", namn:"Samling Näringsliv", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
-{kategori:"Näringsliv", namn:"IUC Jämtland Härjedalen", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
-{kategori:"Näringsliv", namn:"Handelskammaren Mitt", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
-{kategori:"Näringsliv", namn:"Företagarna", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
-{kategori:"Näringsliv", namn:"Jämtland Härjedalen Turism (JHT)", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
-{kategori:"Näringsliv", namn:"Svenskt Näringsliv Jämtland", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
-{kategori:"Näringsliv", namn:"Nyföretagarcentrum", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
-{kategori:"Näringsliv", namn:"Lantbrukarnas riksorganisation (LRF)", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
-{kategori:"Näringsliv", namn:"Peak Inkubator", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
-{kategori:"Näringsliv", namn:"NHO Næringslivets Hovedorganisasjon", lat:63.44683, lon:10.42191, region:"Trøndelag", färg:"red", säte:"Trondheim"},
-{kategori:"Näringsliv", namn:"Næringsforeningen i Trondheimsregionen (NiT)", lat:63.44683, lon:10.42191, region:"Trøndelag", färg:"red", säte:"Trondheim"},
-{kategori:"Näringsliv", namn:"Innherred Næringsforening", lat:64.01519, lon:11.49526, region:"Trøndelag", färg:"red", säte:"Steinkjer"},
-{kategori:"Näringsliv", namn:"Rørosregionen Næringshage", lat:62.5747, lon:11.3842, region:"Trøndelag", färg:"red", säte:"Røros"},
-// Fortsätt med alla resterande organisationer på samma format
+  // Näringsliv – Jämtland
+  { kategori: 'Näringsliv', namn: 'Samling Näringsliv', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+  { kategori: 'Näringsliv', namn: 'IUC Jämtland Härjedalen', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+  { kategori: 'Näringsliv', namn: 'Handelskammaren Mitt', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+  { kategori: 'Näringsliv', namn: 'Företagarna', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+  { kategori: 'Näringsliv', namn: 'Jämtland Härjedalen Turism (JHT)', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+  { kategori: 'Näringsliv', namn: 'Svenskt Näringsliv Jämtland', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+  { kategori: 'Näringsliv', namn: 'Nyföretagarcentrum', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+  { kategori: 'Näringsliv', namn: 'Lantbrukarnas riksorganisation (LRF)', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+  { kategori: 'Näringsliv', namn: 'Peak Inkubator', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+  { kategori: 'Näringsliv', namn: 'Uniper', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+  { kategori: 'Näringsliv', namn: 'Persson Invest', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+
+  // Näringsliv – Trøndelag
+  { kategori: 'Näringsliv', namn: 'NHO Næringslivets Hovedorganisasjon', lat: 63.44683, lon: 10.42191, färg: 'red', säte: 'Trondheim' },
+  { kategori: 'Näringsliv', namn: 'Næringsforeningen i Trondheimsregionen (NiT)', lat: 63.44683, lon: 10.42191, färg: 'red', säte: 'Trondheim' },
+  { kategori: 'Näringsliv', namn: 'Innherred Næringsforening', lat: 64.01519, lon: 11.49526, färg: 'red', säte: 'Steinkjer' },
+  { kategori: 'Näringsliv', namn: 'Rørosregionen Næringshage', lat: 62.5747, lon: 11.3842, färg: 'red', säte: 'Røros' },
+  { kategori: 'Näringsliv', namn: 'Nasjonalparken Næringshage', lat: 62.5747, lon: 11.3842, färg: 'red', säte: 'Røros' },
+  { kategori: 'Näringsliv', namn: 'FI Næringshage', lat: 64.01519, lon: 11.49526, färg: 'red', säte: 'Steinkjer' },
+  { kategori: 'Näringsliv', namn: 'Tindved Kulturhage', lat: 64.01519, lon: 11.49526, färg: 'red', säte: 'Steinkjer' },
+  { kategori: 'Näringsliv', namn: 'Næringshagen Hitra og Frøya', lat: 63.5453, lon: 8.9320, färg: 'red', säte: 'Hitra' },
+  { kategori: 'Näringsliv', namn: 'Blått Kompetansesenter AS', lat: 63.44683, lon: 10.42191, färg: 'red', säte: 'Trondheim' },
+  { kategori: 'Näringsliv', namn: 'INAM AS (Innovasjon Namdal)', lat: 64.4662, lon: 11.4957, färg: 'red', säte: 'Namsos' },
+  { kategori: 'Näringsliv', namn: 'Thams Innovasjon AS', lat: 63.44683, lon: 10.42191, färg: 'red', säte: 'Trondheim' },
+  { kategori: 'Näringsliv', namn: 'Naeringsforeningen i Vaernesregionen', lat: 63.4669, lon: 11.1863, färg: 'red', säte: 'Stjørdal' },
+  { kategori: 'Näringsliv', namn: 'Proneo', lat: 64.01519, lon: 11.49526, färg: 'red', säte: 'Steinkjer' },
+  { kategori: 'Näringsliv', namn: 'Fremtidens Industri AS (FI)', lat: 63.44683, lon: 10.42191, färg: 'red', säte: 'Trondheim' },
+  { kategori: 'Näringsliv', namn: 'Trøndelag Reiseliv', lat: 63.44683, lon: 10.42191, färg: 'red', säte: 'Trondheim' },
+  { kategori: 'Näringsliv', namn: 'Nordsec (tidigare Midsec)', lat: 63.44683, lon: 10.42191, färg: 'red', säte: 'Trondheim' },
+  { kategori: 'Näringsliv', namn: 'Industrinavet i Trøndelag', lat: 63.44683, lon: 10.42191, färg: 'red', säte: 'Trondheim' },
+  { kategori: 'Näringsliv', namn: 'RENERGY – Renewable Energy Cluster', lat: 63.44683, lon: 10.42191, färg: 'red', säte: 'Trondheim' },
+  { kategori: 'Näringsliv', namn: 'WoodWorks! Cluster', lat: 63.44683, lon: 10.42191, färg: 'red', säte: 'Trondheim' },
+  { kategori: 'Näringsliv', namn: 'Aneo', lat: 63.44683, lon: 10.42191, färg: 'red', säte: 'Trondheim' },
+  { kategori: 'Näringsliv', namn: 'Ritek', lat: 63.7464, lon: 11.2941, färg: 'red', säte: 'Levanger' },
+
+  // Offentlig sektor – Trøndelag
+  { kategori: 'Offentlig sektor', namn: 'Statsforvalteren', lat: 63.44683, lon: 10.42191, färg: 'blue', säte: 'Trondheim' },
+  { kategori: 'Offentlig sektor', namn: 'Helse Midt-Norge RHF', lat: 64.01519, lon: 11.49526, färg: 'blue', säte: 'Steinkjer' },
+  { kategori: 'Offentlig sektor', namn: 'Statens vägvesende', lat: 63.44683, lon: 10.42191, färg: 'blue', säte: 'Trondheim' },
+  { kategori: 'Offentlig sektor', namn: 'Politi', lat: 63.44683, lon: 10.42191, färg: 'blue', säte: 'Trondheim' },
+  { kategori: 'Offentlig sektor', namn: 'Tolletaten', lat: 63.44683, lon: 10.42191, färg: 'blue', säte: 'Trondheim' },
+  { kategori: 'Offentlig sektor', namn: 'NAV', lat: 63.44683, lon: 10.42191, färg: 'blue', säte: 'Trondheim' },
+  { kategori: 'Offentlig sektor', namn: 'Försvarskoordinatorn Trøndelag', lat: 63.44683, lon: 10.42191, färg: 'blue', säte: 'Trondheim' },
+  { kategori: 'Offentlig sektor', namn: 'Kommunförbundet Trøndelag', lat: 63.44683, lon: 10.42191, färg: 'blue', säte: 'Trondheim' },
+  { kategori: 'Offentlig sektor', namn: 'Skatteetaten', lat: 63.44683, lon: 10.42191, färg: 'blue', säte: 'Trondheim' },
+
+  // Offentlig sektor – Jämtland
+  { kategori: 'Offentlig sektor', namn: 'Länsstyrelsen', lat: 63.17917, lon: 14.63583, färg: 'blue', säte: 'Östersund' },
+  { kategori: 'Offentlig sektor', namn: 'Arbetsförmedlingen', lat: 63.17917, lon: 14.63583, färg: 'blue', säte: 'Östersund' },
+  { kategori: 'Offentlig sektor', namn: 'Polisen', lat: 63.17917, lon: 14.63583, färg: 'blue', säte: 'Östersund' },
+  { kategori: 'Offentlig sektor', namn: 'Försäkringskassan', lat: 63.17917, lon: 14.63583, färg: 'blue', säte: 'Östersund' },
+  { kategori: 'Offentlig sektor', namn: 'Tullverket', lat: 63.17917, lon: 14.63583, färg: 'blue', säte: 'Östersund' },
+  { kategori: 'Offentlig sektor', namn: 'Skatteverket', lat: 63.17917, lon: 14.63583, färg: 'blue', säte: 'Östersund' },
+  { kategori: 'Offentlig sektor', namn: 'Almi', lat: 63.17917, lon: 14.63583, färg: 'blue', säte: 'Östersund' },
+  { kategori: 'Offentlig sektor', namn: 'Kommunförbundet JH', lat: 63.17917, lon: 14.63583, färg: 'blue', säte: 'Östersund' },
+  { kategori: 'Offentlig sektor', namn: 'Sametinget', lat: 63.17917, lon: 14.63583, färg: 'blue', säte: 'Östersund' },
+  { kategori: 'Offentlig sektor', namn: 'Samverket/Myndighetsnätverket', lat: 63.17917, lon: 14.63583, färg: 'blue', säte: 'Östersund' },
+
+  // Utbildning – Jämtland
+  { kategori: 'Utbildning', namn: 'Mittuniversitetet (MIUN)', lat: 63.17917, lon: 14.63583, färg: 'yellow', säte: 'Östersund' },
+  { kategori: 'Utbildning', namn: 'Hushållningssällskapet', lat: 63.17917, lon: 14.63583, färg: 'yellow', säte: 'Östersund' },
+  { kategori: 'Utbildning', namn: 'Torsta AB', lat: 63.0000, lon: 14.5000, färg: 'yellow', säte: 'Torsta' },
+
+  // Utbildning – Trøndelag
+  { kategori: 'Utbildning', namn: 'Norwegian University of Science and Technology NTNU', lat: 63.44683, lon: 10.42191, färg: 'yellow', säte: 'Trondheim' },
+  { kategori: 'Utbildning', namn: 'NTNU:s Næringslivsringer', lat: 63.44683, lon: 10.42191, färg: 'yellow', säte: 'Trondheim' },
+  { kategori: 'Utbildning', namn: 'Dronning Mauds Minne Høgskole DMMH', lat: 63.44683, lon: 10.42191, färg: 'yellow', säte: 'Trondheim' },
+  { kategori: 'Utbildning', namn: 'Nord universitet (Campus Levanger, Steinkjer och Namsos)', lat: 63.7464, lon: 11.2941, färg: 'yellow', säte: 'Levanger' },
+  { kategori: 'Utbildning', namn: 'Sintef', lat: 63.44683, lon: 10.42191, färg: 'yellow', säte: 'Trondheim' },
+  { kategori: 'Utbildning', namn: 'Falstadsenteret', lat: 63.6500, lon: 11.2833, färg: 'yellow', säte: 'Ekne' }
+
+  // Samarbeten/Nätverk – Jämtland och Trøndelag
+{ kategori: 'Samarbeten', namn: 'Gränsräddningsrådet Nordred', lat: 59.3293, lon: 18.0686, färg: 'green', säte: 'Stockholm' },
+{ kategori: 'Samarbeten', namn: 'Samarbete mellan polisen', lat: 61.8230, lon: 12.0380, färg: 'green', säte: 'Vauldalen' },
+{ kategori: 'Samarbeten', namn: 'Tullsamarbete (Storlien och Vauldalen)', lat: 63.3300, lon: 12.1167, färg: 'green', säte: 'Storlien' },
+{ kategori: 'Samarbeten', namn: 'Platform North', lat: 63.17917, lon: 14.63583, färg: 'green', säte: 'Östersund' },
+{ kategori: 'Samarbeten', namn: 'Atlantbanan', lat: 63.44683, lon: 10.42191, färg: 'green', säte: 'Trondheim' },
+{ kategori: 'Samarbeten', namn: 'Föreningen Norden i Östersund', lat: 63.17917, lon: 14.63583, färg: 'green', säte: 'Östersund' },
+{ kategori: 'Samarbeten', namn: 'Föreningen Norden i Trondheim', lat: 63.44683, lon: 10.42191, färg: 'green', säte: 'Trondheim' },
+
+// Finansiering – Jämtland och Trøndelag
+{ kategori: 'Finansiering', namn: 'Interreg Sverige Norge Nordens gröna bälte', lat: 63.17917, lon: 14.63583, färg: 'purple', säte: 'Östersund' },
+{ kategori: 'Finansiering', namn: 'Interreg Aurora', lat: 65.5848, lon: 22.1567, färg: 'purple', säte: 'Luleå' },
+{ kategori: 'Finansiering', namn: 'Innovation Norge', lat: 63.44683, lon: 10.42191, färg: 'purple', säte: 'Trondheim' },
+{ kategori: 'Finansiering', namn: 'Leader Grogrund', lat: 63.3667, lon: 14.5833, färg: 'purple', säte: 'Brunflo' },
+{ kategori: 'Finansiering', namn: 'Leader 3Sam', lat: 62.8333, lon: 15.1667, färg: 'purple', säte: 'Hammarstrand' },
+{ kategori: 'Finansiering', namn: 'Leader Mittland Plus', lat: 62.3908, lon: 17.3069, färg: 'purple', säte: 'Sundsvall' },
+{ kategori: 'Finansiering', namn: 'Region JH', lat: 63.17917, lon: 14.63583, färg: 'purple', säte: 'Östersund' },
+{ kategori: 'Finansiering', namn: 'Trøndelag fylkeskommune', lat: 63.17917, lon: 14.63583, färg: 'purple', säte: 'Östersund' },
+{ kategori: 'Finansiering', namn: 'Tillväxtverket', lat: 63.44683, lon: 10.42191, färg: 'purple', säte: 'Trondheim' },
+{ kategori: 'Finansiering', namn: 'ESF-rådet Mellersta Norrland', lat: 60.6749, lon: 17.1413, färg: 'purple', säte: 'Gävle' },
+
+// Samarbeten/Nätverk – Jämtland och Trøndelag
+{ kategori: 'Samarbeten/Nätverk', namn: 'Bærekraftsnettverket i Trøndelag', lat: 63.44683, lon: 10.42191, färg: 'purple', säte: 'Trondheim' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'Work in Trondheim', lat: 63.44683, lon: 10.42191, färg: 'purple', säte: 'Trondheim' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'Meetup – Nätverksträffar i Trondheim', lat: 63.44683, lon: 10.42191, färg: 'purple', säte: 'Trondheim' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'Digs Incubator Trondheim', lat: 63.44683, lon: 10.42191, färg: 'purple', säte: 'Trondheim' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'StartupTRD', lat: 63.44683, lon: 10.42191, färg: 'purple', säte: 'Trondheim' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'BNI Executive Trondheim', lat: 63.44683, lon: 10.42191, färg: 'purple', säte: 'Trondheim' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'Trondheim Tech Port', lat: 63.44683, lon: 10.42191, färg: 'purple', säte: 'Trondheim' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'Connect Midt Norge', lat: 63.44683, lon: 10.42191, färg: 'purple', säte: 'Trondheim' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'The Power Region', lat: 63.17917, lon: 14.63583, färg: 'purple', säte: 'Östersund' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'Driv Innovation', lat: 63.17917, lon: 14.63583, färg: 'purple', säte: 'Östersund' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'Vindkraftcentrum', lat: 63.1833, lon: 14.4167, färg: 'purple', säte: 'Hammerdal' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'Business Region MidSweden', lat: 63.17917, lon: 14.63583, färg: 'purple', säte: 'Östersund' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'BNI City Östersund', lat: 63.17917, lon: 14.63583, färg: 'purple', säte: 'Östersund' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'Gomorron / The remote lab', lat: 63.17917, lon: 14.63583, färg: 'purple', säte: 'Östersund' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'Ta Steget', lat: 63.17917, lon: 14.63583, färg: 'purple', säte: 'Östersund' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'Partnerskap Mittstråket', lat: 63.17917, lon: 14.63583, färg: 'purple', säte: 'Östersund' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'House Bee', lat: 63.4167, lon: 13.0833, färg: 'purple', säte: 'Åre' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'E14 Invest', lat: 63.4167, lon: 13.0833, färg: 'purple', säte: 'Åre' },
+{ kategori: 'Samarbeten/Nätverk', namn: 'Nätverket Kompetensattraktion Jämtland', lat: 63.17917, lon: 14.63583, färg: 'purple', säte: 'Östersund' },
+
+// Näringsliv – fler
+{ kategori: 'Näringsliv', namn: 'Uniper', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+{ kategori: 'Näringsliv', namn: 'Aneo', lat: 63.44683, lon: 10.42191, färg: 'red', säte: 'Trondheim' },
+{ kategori: 'Näringsliv', namn: 'Ritek', lat: 63.7464, lon: 11.2941, färg: 'red', säte: 'Levanger' },
+{ kategori: 'Näringsliv', namn: 'Persson Invest', lat: 63.17917, lon: 14.63583, färg: 'red', säte: 'Östersund' },
+
+// Kultur – Trøndelag och Jämtland
+{ kategori: 'Kultur', namn: 'Trøndelag Kulturkrets', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Kulturkontakt Trondheim', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Trøndelag Teater', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Rockheim', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Museene i Sør-Trøndelag', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Stiklestad Nasjonale Kultursenter', lat: 63.7460, lon: 10.9680, färg: 'orange', säte: 'Stiklestad' },
+{ kategori: 'Kultur', namn: 'Stiftinga Hilmar Alexandersen', lat: 64.01519, lon: 11.49526, färg: 'orange', säte: 'Steinkjer' },
+{ kategori: 'Kultur', namn: 'Saemien Sijte', lat: 64.0000, lon: 12.0000, färg: 'orange', säte: 'Snåsa' },
+{ kategori: 'Kultur', namn: 'Gaaltije', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Kultur', namn: 'Jamtli', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Kultur', namn: 'Heimbygda', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Kultur', namn: 'Föreningsarkivet i Jämtlands län', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Kultur', namn: 'RF-SISU Jämtland-Härjedalen', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Kultur', namn: 'SPF Seniorerna Jämtland-Härjedalen', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Kultur', namn: 'Kultur i Jämtland Härjedalen', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+
+// Kultur – fortsättning Jämtland
+{ kategori: 'Kultur', namn: 'Elden', lat: 62.5747, lon: 11.3842, färg: 'orange', säte: 'Røros' },
+{ kategori: 'Kultur', namn: 'Rørosmartnan', lat: 62.5747, lon: 11.3842, färg: 'orange', säte: 'Røros' },
+{ kategori: 'Kultur', namn: 'Olavsfest', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Basta – Litteraturhuset i Trondheim', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Pstereo', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Trondheim Rocks', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Jazzfest', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'NEON Festivalen', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Festningen', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Steinkjerfestivalen', lat: 64.01519, lon: 11.49526, färg: 'orange', säte: 'Steinkjer' },
+{ kategori: 'Kultur', namn: 'Trøndersk Matfestival', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Trondheim Bryggerifestival', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Kultur', namn: 'Stiklestadspelet – Spelet om Heilag Olav', lat: 63.7675, lon: 11.4975, färg: 'orange', säte: 'Verdal' },
+{ kategori: 'Kultur', namn: 'Kortreist Dansefestival', lat: 63.9667, lon: 11.3667, färg: 'orange', säte: 'Inderøy' },
+{ kategori: 'Kultur', namn: 'Funäs Festival', lat: 62.5667, lon: 12.5000, färg: 'orange', säte: 'Funäsdalen' },
+{ kategori: 'Kultur', namn: 'Jamtli Vårmarknad', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Kultur', namn: 'Jamtli Julmarknad', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Kultur', namn: 'Härdalsyran & Härdalsveckan', lat: 61.8333, lon: 14.2000, färg: 'orange', säte: 'Lillhärdal' },
+{ kategori: 'Kultur', namn: 'Musikkväll på Kalfjäll', lat: 62.5000, lon: 12.3000, färg: 'orange', säte: 'Tänndalen' },
+{ kategori: 'Kultur', namn: 'Kulturting Norr', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Kultur', namn: 'Storsjöyran', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Kultur', namn: 'Kul Tur', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Kultur', namn: 'Åre Sessions', lat: 63.4167, lon: 13.0833, färg: 'orange', säte: 'Åre' },
+{ kategori: 'Kultur', namn: 'Musikkväll vid Åresjön', lat: 63.4167, lon: 13.0833, färg: 'orange', säte: 'Åre' },
+{ kategori: 'Kultur', namn: 'Västgård Game Fair', lat: 63.4167, lon: 13.0833, färg: 'orange', säte: 'Åre' },
+{ kategori: 'Kultur', namn: 'Åre Höstmarknad', lat: 63.4167, lon: 13.0833, färg: 'orange', säte: 'Åre' },
+
+// Sport – Trøndelag och Jämtland
+{ kategori: 'Sport', namn: 'Meråkerrennet', lat: 63.1833, lon: 11.4333, färg: 'orange', säte: 'Meråker' },
+{ kategori: 'Sport', namn: 'Norgescup Skiskyting', lat: 63.1833, lon: 11.4333, färg: 'orange', säte: 'Meråker' },
+{ kategori: 'Sport', namn: 'Erik Håker Cup', lat: 62.6000, lon: 9.6500, färg: 'orange', säte: 'Oppdal' },
+{ kategori: 'Sport', namn: 'Knykenlekene (barn- och ungdomsfestival)', lat: 63.0000, lon: 9.0000, färg: 'orange', säte: 'Orkland' },
+{ kategori: 'Sport', namn: 'Trondheim Maraton', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Sport', namn: 'Lånkebanen Rallycross (NM och internationella tävlingar)', lat: 63.4667, lon: 10.9167, färg: 'orange', säte: 'Hell, Stjørdal' },
+{ kategori: 'Sport', namn: 'Skandia Cup (fotbollsturnering för barn & ungdom)', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Sport', namn: 'Trondheimslekene', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Sport', namn: 'Rennebumartnan Skisprint (del av lokal skidhelg)', lat: 62.8000, lon: 9.5000, färg: 'orange', säte: 'Rennebu' },
+{ kategori: 'Sport', namn: 'Julecup i Håndball', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Sport', namn: 'Leangen Travbanes stora travhelger', lat: 63.44683, lon: 10.42191, färg: 'orange', säte: 'Trondheim' },
+{ kategori: 'Sport', namn: 'Birkebeiner-rennet på Røros/Trøndelag', lat: 62.5747, lon: 11.3842, färg: 'orange', säte: 'Røros' },
+{ kategori: 'Sport', namn: 'Storsjöcupen', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Sport', namn: 'Bruksvallsloppet', lat: 62.6167, lon: 12.6167, färg: 'orange', säte: 'Bruksvallarna' },
+{ kategori: 'Sport', namn: 'Fjälltopploppet', lat: 62.6167, lon: 12.6167, färg: 'orange', säte: 'Bruksvallarna' },
+{ kategori: 'Sport', namn: 'St Olavsloppet', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Sport', namn: 'Vårruset', lat: 63.17917, lon: 14.63583, färg: 'orange', säte: 'Östersund' },
+{ kategori: 'Sport', namn: 'Åre Bike Festival', lat: 63.4167, lon: 13.0833, färg: 'orange', säte: 'Åre' },
+{ kategori: 'Sport', namn: 'Fjällmaratonveckan', lat: 63.4167, lon: 13.0833, färg: 'orange', säte: 'Åre' },
+{ kategori: 'Sport', namn: 'Red Bull GIBAWAY', lat: 63.4167, lon: 13.0833, färg: 'orange', säte: 'Åre' },
+{ kategori: 'Sport', namn: 'Vemdalsslalom (ungdom)', lat: 62.7500, lon: 14.0000, färg: 'orange', säte: 'Vemdalen' },
+  
 ];
 
 
-// Skapa karta
+
 const map = L.map('map').setView([63.17917, 14.63583], 6);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(map);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+attribution: '© OpenStreetMap contributors'
+}).addTo(map);
 
 
-const markers = [];
-organizations.forEach(org => {
-const marker = L.circleMarker([org.lat, org.lon], {
-color: org.färg,
-radius: 8,
-fillOpacity: 0.7
-}).bindPopup(`<b>${org.namn}</b><br>${org.kategori}<br>${org.region}, ${org.säte}`);
-markers.push({org, marker});
+const markers = organizations.map(org => {
+const marker = L.circleMarker([org.lat, org.lon], { color: org.färg, radius: 8 }).addTo(map);
+marker.bindPopup(`<b>${org.namn}</b><br>${org.säte}`);
+return { ...org, marker };
 });
 
 
-// Fyll dropdown med unika kategorier
-const kategoriFilter = document.getElementById('kategori-filter');
-const kategorier = [...new Set(organizations.map(o => o.kategori))];
-kategorier.forEach(k => {
-const option = document.createElement('option');
-option.value = k;
-option.innerText = k;
-kategoriFilter.appendChild(option);
-});
+const orgList = document.getElementById('orgList');
+const categorySelect = document.getElementById('categorySelect');
 
 
-// Funktion för att uppdatera lista och markörer
-function updateView() {
-const selected = kategoriFilter.value;
-const listContainer = document.getElementById('org-list');
-listContainer.innerHTML = '';
-
-
-markers.forEach(({org, marker}) => {
-const show = selected === 'Alla' || org.kategori === selected;
-if(show) {
-marker.addTo(map);
-const el = document.createElement('div');
-el.className = 'org-item';
-el.innerText = org.namn;
-el.onclick = () => { map.setView([org.lat, org.lon], 10); marker.openPopup(); };
-listContainer.appendChild(el);
+function updateList() {
+const selectedCategory = categorySelect.value;
+orgList.innerHTML = '';
+markers.forEach(org => {
+if (selectedCategory === 'Alla' || org.kategori === selectedCategory) {
+org.marker.addTo(map);
+const div = document.createElement('div');
+div.className = 'org-item';
+div.textContent = org.namn + ' (' + org.säte + ')';
+div.onclick = () => map.setView([org.lat, org.lon], 10);
+orgList.appendChild(div);
 } else {
-map.removeLayer(marker);
+map.removeLayer(org.marker);
 }
 });
 }
 
 
-// Initiera vy
-updateView();
-kategoriFilter.addEventListener('change', updateView);
+categorySelect.addEventListener('change', updateList);
+updateList();
+</script>
+</html>
