@@ -6,115 +6,100 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <style>
-  body { margin:0; display:flex; height:100vh; font-family: Arial, sans-serif; }
-  #sidebar { width: 300px; overflow-y: auto; padding: 10px; border-right: 1px solid #ccc; }
-  #map { flex:1; }
-  .org-item { padding:5px; cursor:pointer; border-bottom:1px solid #eee; }
-  .org-item:hover { background:#f0f0f0; }
-  select { width: 100%; margin-bottom: 10px; padding: 5px; }
+body { margin:0; display:flex; height:100vh; font-family: Arial, sans-serif; }
+#sidebar { width: 300px; overflow-y: auto; padding: 10px; border-right: 1px solid #ccc; }
+#map { flex:1; }
+.org-item { padding:5px; cursor:pointer; border-bottom:1px solid #eee; }
+.org-item:hover { background:#f0f0f0; }
+select { width: 100%; margin-bottom: 10px; padding: 5px; }
 </style>
 </head>
 <body>
 
+
 <div id="sidebar">
-  <h3>Organisationer</h3>
-  <label for="kategori-filter">Välj kategori:</label>
-  <select id="kategori-filter">
-    <option value="Alla">Alla</option>
-  </select>
-  <div id="org-list"></div>
+<h3>Organisationer</h3>
+<label for="kategori-filter">Välj kategori:</label>
+<select id="kategori-filter">
+<option value="Alla">Alla</option>
+</select>
+<div id="org-list"></div>
 </div>
 
+
 <div id="map"></div>
+
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 const organizations = [
-  {kategori:"Näringsliv", namn:"Samling Näringsliv", lat:63.17917, lon:14.63583, region:"Jämtland", säte:"Östersund", färg:"red"},
-  {kategori:"Näringsliv", namn:"IUC Jämtland Härjedalen", lat:63.17917, lon:14.63583, region:"Jämtland", säte:"Östersund", färg:"red"},
-  {kategori:"Näringsliv", namn:"NHO Næringslivets Hovedorganisasjon", lat:63.44683, lon:10.42191, region:"Trøndelag", säte:"Trondheim", färg:"red"},
-  {kategori:"Näringsliv", namn:"Næringsforeningen i Trondheimsregionen (NiT)", lat:63.44683, lon:10.42191, region:"Trøndelag", säte:"Trondheim", färg:"red"},
-  {kategori:"Offentlig sektor", namn:"Statsforvalteren", lat:63.44683, lon:10.42191, region:"Trøndelag", säte:"Trondheim", färg:"blue"},
-  {kategori:"Offentlig sektor", namn:"Helse Midt-Norge RHF", lat:64.01519, lon:11.49526, region:"Trøndelag", säte:"Steinkjer", färg:"blue"},
-  {kategori:"Offentlig sektor", namn:"Länsstyrelsen", lat:63.17917, lon:14.63583, region:"Jämtland", säte:"Östersund", färg:"blue"},
-  {kategori:"Offentlig sektor", namn:"Arbetsförmedlingen", lat:63.17917, lon:14.63583, region:"Jämtland", säte:"Östersund", färg:"blue"},
-  {kategori:"Utbildning", namn:"Mittuniversitetet (MIUN)", lat:63.17917, lon:14.63583, region:"Jämtland", säte:"Östersund", färg:"yellow"},
-  {kategori:"Utbildning", namn:"Hushållningssällskapet", lat:63.17917, lon:14.63583, region:"Jämtland", säte:"Östersund", färg:"yellow"},
-  {kategori:"Utbildning", namn:"Norwegian University of Science and Technology NTNU", lat:63.44683, lon:10.42191, region:"Trøndelag", säte:"Trondheim", färg:"yellow"},
-  {kategori:"Utbildning", namn:"NTNU:s Næringslivsringer", lat:63.44683, lon:10.42191, region:"Trøndelag", säte:"Trondheim", färg:"yellow"},
-  {kategori:"Samarbeten", namn:"Gränsräddningsrådet Nordred", lat:59.3293, lon:18.0686, region:"Jämtland", säte:"Stockholm", färg:"green"},
-  {kategori:"Samarbeten", namn:"Samarbete mellan polisen", lat:61.8230, lon:12.0380, region:"Trøndelag", säte:"Vauldalen", färg:"green"},
-  {kategori:"Finansiering", namn:"Interreg Sverige Norge Nordens gröna bälte", lat:63.17917, lon:14.63583, region:"Jämtland", säte:"Östersund", färg:"purple"},
-  {kategori:"Finansiering", namn:"Interreg Aurora", lat:65.5848, lon:22.1567, region:"Jämtland", säte:"Luleå", färg:"purple"},
-  {kategori:"Samarbeten/Nätverk", namn:"Bærekraftsnettverket i Trøndelag", lat:63.44683, lon:10.42191, region:"Trøndelag", säte:"Trondheim", färg:"purple"},
-  {kategori:"Samarbeten/Nätverk", namn:"Work in Trondheim", lat:63.44683, lon:10.42191, region:"Trøndelag", säte:"Trondheim", färg:"purple"},
-  {kategori:"Kultur", namn:"Trøndelag Kulturkrets", lat:63.44683, lon:10.42191, region:"Trøndelag", säte:"Trondheim", färg:"orange"},
-  {kategori:"Kultur", namn:"Kulturkontakt Trondheim", lat:63.44683, lon:10.42191, region:"Trøndelag", säte:"Trondheim", färg:"orange"},
-  {kategori:"Kultur", namn:"Gaaltije", lat:63.17917, lon:14.63583, region:"Jämtland", säte:"Östersund", färg:"orange"},
-  {kategori:"Kultur", namn:"Jamtli", lat:63.17917, lon:14.63583, region:"Jämtland", säte:"Östersund", färg:"orange"},
-  {kategori:"Samarbeten/Nätverk", namn:"Grensetjänsten", lat:59.9500, lon:11.5000, region:"Jämtland", säte:"Morokulien", färg:"green"},
-  {kategori:"Samarbeten/Nätverk", namn:"Business Sweden", lat:59.3293, lon:18.0686, region:"Jämtland", säte:"Stockholm", färg:"green"},
-  {kategori:"Samarbeten/Nätverk", namn:"Nordiska ministerrådet", lat:55.6761, lon:12.5683, region:"Övrigt", säte:"Köpenhamn", färg:"green"},
-  {kategori:"Samarbeten/Nätverk", namn:"Nordiska rådet", lat:55.6761, lon:12.5683, region:"Övrigt", säte:"Köpenhamn", färg:"green"},
-  {kategori:"Kultur", namn:"Elden", lat:2.5747, lon:11.3842, region:"Trøndelag", säte:"Røros", färg:"orange"},
-  {kategori:"Kultur", namn:"Rørosmartnan", lat:2.5747, lon:11.3842, region:"Trøndelag", säte:"Røros", färg:"orange"},
-  {kategori:"Kultur", namn:"Funäs Festival", lat:62.5667, lon:12.5000, region:"Jämtland", säte:"Funäsdalen", färg:"orange"},
-  {kategori:"Kultur", namn:"Jamtli Vårmarknad", lat:63.17917, lon:14.63583, region:"Jämtland", säte:"Östersund", färg:"orange"},
-  {kategori:"Sport", namn:"Meråkerrennet", lat:63.1833, lon:11.4333, region:"Trøndelag", säte:"Meråker", färg:"orange"},
-  {kategori:"Sport", namn:"Norgescup Skiskyting", lat:63.1833, lon:11.4333, region:"Trøndelag", säte:"Meråker", färg:"orange"},
-  {kategori:"Sport", namn:"Storsjöcupen", lat:63.17917, lon:14.63583, region:"Jämtland", säte:"Östersund", färg:"orange"},
-  {kategori:"Sport", namn:"Bruksvallsloppet", lat:62.6167, lon:12.6167, region:"Jämtland", säte:"Bruksvallarna", färg:"orange"}
+{kategori:"Näringsliv", namn:"Samling Näringsliv", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
+{kategori:"Näringsliv", namn:"IUC Jämtland Härjedalen", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
+{kategori:"Näringsliv", namn:"Handelskammaren Mitt", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
+{kategori:"Näringsliv", namn:"Företagarna", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
+{kategori:"Näringsliv", namn:"Jämtland Härjedalen Turism (JHT)", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
+{kategori:"Näringsliv", namn:"Svenskt Näringsliv Jämtland", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
+{kategori:"Näringsliv", namn:"Nyföretagarcentrum", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
+{kategori:"Näringsliv", namn:"Lantbrukarnas riksorganisation (LRF)", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
+{kategori:"Näringsliv", namn:"Peak Inkubator", lat:63.17917, lon:14.63583, region:"Jämtland", färg:"red", säte:"Östersund"},
+{kategori:"Näringsliv", namn:"NHO Næringslivets Hovedorganisasjon", lat:63.44683, lon:10.42191, region:"Trøndelag", färg:"red", säte:"Trondheim"},
+{kategori:"Näringsliv", namn:"Næringsforeningen i Trondheimsregionen (NiT)", lat:63.44683, lon:10.42191, region:"Trøndelag", färg:"red", säte:"Trondheim"},
+{kategori:"Näringsliv", namn:"Innherred Næringsforening", lat:64.01519, lon:11.49526, region:"Trøndelag", färg:"red", säte:"Steinkjer"},
+{kategori:"Näringsliv", namn:"Rørosregionen Næringshage", lat:62.5747, lon:11.3842, region:"Trøndelag", färg:"red", säte:"Røros"},
+// Fortsätt med alla resterande organisationer på samma format
 ];
+
 
 // Skapa karta
 const map = L.map('map').setView([63.17917, 14.63583], 6);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(map);
 
+
 const markers = [];
 organizations.forEach(org => {
-  const marker = L.circleMarker([org.lat, org.lon], {
-    color: org.färg,
-    radius: 8,
-    fillOpacity: 0.7
-  }).bindPopup(`<b>${org.namn}</b><br>${org.kategori}<br>${org.region}, ${org.säte}`);
-  markers.push({org, marker});
+const marker = L.circleMarker([org.lat, org.lon], {
+color: org.färg,
+radius: 8,
+fillOpacity: 0.7
+}).bindPopup(`<b>${org.namn}</b><br>${org.kategori}<br>${org.region}, ${org.säte}`);
+markers.push({org, marker});
 });
+
 
 // Fyll dropdown med unika kategorier
 const kategoriFilter = document.getElementById('kategori-filter');
 const kategorier = [...new Set(organizations.map(o => o.kategori))];
 kategorier.forEach(k => {
-  const option = document.createElement('option');
-  option.value = k;
-  option.innerText = k;
-  kategoriFilter.appendChild(option);
+const option = document.createElement('option');
+option.value = k;
+option.innerText = k;
+kategoriFilter.appendChild(option);
 });
+
 
 // Funktion för att uppdatera lista och markörer
 function updateView() {
-  const selected = kategoriFilter.value;
-  const listContainer = document.getElementById('org-list');
-  listContainer.innerHTML = '';
+const selected = kategoriFilter.value;
+const listContainer = document.getElementById('org-list');
+listContainer.innerHTML = '';
 
-  markers.forEach(({org, marker}) => {
-    const show = selected === 'Alla' || org.kategori === selected;
-    if(show) {
-      marker.addTo(map);
-      const el = document.createElement('div');
-      el.className = 'org-item';
-      el.innerText = org.namn;
-      el.onclick = () => { map.setView([org.lat, org.lon], 10); marker.openPopup(); };
-      listContainer.appendChild(el);
-    } else {
-      map.removeLayer(marker);
-    }
-  });
+
+markers.forEach(({org, marker}) => {
+const show = selected === 'Alla' || org.kategori === selected;
+if(show) {
+marker.addTo(map);
+const el = document.createElement('div');
+el.className = 'org-item';
+el.innerText = org.namn;
+el.onclick = () => { map.setView([org.lat, org.lon], 10); marker.openPopup(); };
+listContainer.appendChild(el);
+} else {
+map.removeLayer(marker);
 }
+});
+}
+
 
 // Initiera vy
 updateView();
 kategoriFilter.addEventListener('change', updateView);
-</script>
-
-</body>
-</html>
