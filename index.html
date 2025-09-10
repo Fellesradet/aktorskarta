@@ -70,7 +70,6 @@
         integrity="sha256-o9N1j7kIht5aYX0m36g+poozM0gfrPTzYhEVuX1kPtY=" crossorigin=""></script>
 
 <script>
-    // --- Din data ---
     const actors = [
         {"Område":"Näringslivsorganisationer - Jämtland Härjedalen","Kategori":"Näringsliv","Organisation":"Samling Näringsliv","Lat":63.17917,"Lon":14.63583,"Region":"Jämtland","Säte":"Östersund","Färgkod":"red"},
         {"Område":"Näringslivsorganisationer - Jämtland Härjedalen","Kategori":"Näringsliv","Organisation":"IUC Jämtland Härjedalen","Lat":63.17917,"Lon":14.63583,"Region":"Jämtland","Säte":"Östersund","Färgkod":"red"},
@@ -87,18 +86,33 @@
         {"Område":"Gränsöverskridande samarbeten regionalt","Kategori":"Samarbeten","Organisation":"Gränsräddningsrådet Nordred","Lat":59.3293,"Lon":18.0686,"Region":"Jämtland","Säte":"Stockholm","Färgkod":"green"},
         {"Område":"Gränsöverskridande samarbeten regionalt","Kategori":"Samarbeten","Organisation":"Samarbete mellan polisen","Lat":61.8230,"Lon":12.0380,"Region":"Trøndelag","Säte":"Vauldalen","Färgkod":"green"},
         {"Område":"Finansiering","Kategori":"Finansiering","Organisation":"Interreg Sverige Norge Nordens gröna bälte","Lat":63.17917,"Lon":14.63583,"Region":"Jämtland","Säte":"Östersund","Färgkod":"purple"},
-        {"Område":"Finansiering","Kategori":"Finansiering","Organisation":"Interreg Aurora","Lat":65.5848,"Lon":22.1567,"Region":"Jämtland","Säte":"Luleå","Färgkod":"purple"}
-        // Du kan lägga till resterande aktörer här på samma sätt
+        {"Område":"Finansiering","Kategori":"Finansiering","Organisation":"Interreg Aurora","Lat":65.5848,"Lon":22.1567,"Region":"Jämtland","Säte":"Luleå","Färgkod":"purple"},
+        {"Område":"Nätverk för kompetens, kapital och företagande - Trøndelag","Kategori":"Samarbeten/Nätverk","Organisation":"Bærekraftsnettverket i Trøndelag","Lat":63.44683,"Lon":10.42191,"Region":"Trøndelag","Säte":"Trondheim","Färgkod":"purple"},
+        {"Område":"Nätverk för kompetens, kapital och företagande - Trøndelag","Kategori":"Samarbeten/Nätverk","Organisation":"Work in Trondheim","Lat":63.44683,"Lon":10.42191,"Region":"Trøndelag","Säte":"Trondheim","Färgkod":"purple"},
+        {"Område":"Civilsamhället kultur - Trøndelag","Kategori":"Kultur","Organisation":"Trøndelag Kulturkrets","Lat":63.44683,"Lon":10.42191,"Region":"Trøndelag","Säte":"Trondheim","Färgkod":"orange"},
+        {"Område":"Civilsamhället kultur - Trøndelag","Kategori":"Kultur","Organisation":"Kulturkontakt Trondheim","Lat":63.44683,"Lon":10.42191,"Region":"Trøndelag","Säte":"Trondheim","Färgkod":"orange"},
+        {"Område":"Civilsamhället kultur - Jämtland Härjedalen","Kategori":"Kultur","Organisation":"Gaaltije","Lat":63.17917,"Lon":14.63583,"Region":"Jämtland","Säte":"Östersund","Färgkod":"orange"},
+        {"Område":"Civilsamhället kultur - Jämtland Härjedalen","Kategori":"Kultur","Organisation":"Jamtli","Lat":63.17917,"Lon":14.63583,"Region":"Jämtland","Säte":"Östersund","Färgkod":"orange"},
+        {"Område":"Gränsöverskridande samarbeten Norge - Sverige","Kategori":"Samarbeten/Nätverk","Organisation":"Grensetjänsten","Lat":59.9500,"Lon":11.5000,"Region":"Jämtland","Säte":"Morokulien","Färgkod":"green"},
+        {"Område":"Gränsöverskridande samarbeten Norge - Sverige","Kategori":"Samarbeten/Nätverk","Organisation":"Business Sweden","Lat":59.3293,"Lon":18.0686,"Region":"Jämtland","Säte":"Stockholm","Färgkod":"green"},
+        {"Område":"Europeiska och nordiska samarbeten","Kategori":"Samarbeten/Nätverk","Organisation":"Nordiska ministerrådet","Lat":55.6761,"Lon":12.5683,"Region":"Övrigt","Säte":"Köpenhamn","Färgkod":"green"},
+        {"Område":"Europeiska och nordiska samarbeten","Kategori":"Samarbeten/Nätverk","Organisation":"Nordiska rådet","Lat":55.6761,"Lon":12.5683,"Region":"Övrigt","Säte":"Köpenhamn","Färgkod":"green"},
+        {"Område":"Kulturevent - Trøndelag","Kategori":"Kultur","Organisation":"Elden","Lat":62.5747,"Lon":11.3842,"Region":"Trøndelag","Säte":"Røros","Färgkod":"orange"},
+        {"Område":"Kulturevent - Trøndelag","Kategori":"Kultur","Organisation":"Rørosmartnan","Lat":62.5747,"Lon":11.3842,"Region":"Trøndelag","Säte":"Røros","Färgkod":"orange"},
+        {"Område":"Kulturevent - Jämtland Härjedalen","Kategori":"Kultur","Organisation":"Funäs Festival","Lat":62.5667,"Lon":12.5000,"Region":"Jämtland","Säte":"Funäsdalen","Färgkod":"orange"},
+        {"Område":"Kulturevent - Jämtland Härjedalen","Kategori":"Kultur","Organisation":"Jamtli Vårmarknad","Lat":63.17917,"Lon":14.63583,"Region":"Jämtland","Säte":"Östersund","Färgkod":"orange"},
+        {"Område":"Sportevent - Trøndelag","Kategori":"Sport","Organisation":"Meråkerrennet","Lat":63.1833,"Lon":11.4333,"Region":"Trøndelag","Säte":"Meråker","Färgkod":"orange"},
+        {"Område":"Sportevent - Trøndelag","Kategori":"Sport","Organisation":"Norgescup Skiskyting","Lat":63.1833,"Lon":11.4333,"Region":"Trøndelag","Säte":"Meråker","Färgkod":"orange"},
+        {"Område":"Sportevent - Jämtland Härjedalen","Kategori":"Sport","Organisation":"Storsjöcupen","Lat":63.17917,"Lon":14.63583,"Region":"Jämtland","Säte":"Östersund","Färgkod":"orange"},
+        {"Område":"Sportevent - Jämtland Härjedalen","Kategori":"Sport","Organisation":"Bruksvallsloppet","Lat":62.6167,"Lon":12.6167,"Region":"Jämtland","Säte":"Bruksvallarna","Färgkod":"orange"}
     ];
 
-    // --- Skapa karta ---
     const map = L.map('map').setView([63.0, 12.0], 6);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // --- Skapa markörer ---
     const markers = [];
     actors.forEach(actor => {
         const marker = L.circleMarker([actor.Lat, actor.Lon], {
@@ -112,11 +126,10 @@
              Region: ${actor.Region}<br>
              Säte: ${actor.Säte}`
         );
-        marker.actor = actor; // För filtrering
+        marker.actor = actor;
         markers.push(marker);
     });
 
-    // --- Skapa filterlistor ---
     const kategoriSet = new Set(actors.map(a => a.Kategori));
     const filterKategori = document.getElementById('filterKategori');
     kategoriSet.forEach(k => {
@@ -135,7 +148,6 @@
         filterRegion.appendChild(opt);
     });
 
-    // --- Funktion för filtrering ---
     function updateFilter() {
         const selectedKategori = filterKategori.value;
         const selectedRegion = filterRegion.value;
@@ -148,7 +160,6 @@
 
             if (matchKategori && matchRegion) {
                 marker.addTo(map);
-                // Lista i sidopanel
                 const div = document.createElement('div');
                 div.className = 'actor-item';
                 div.style.borderLeftColor = marker.actor.Färgkod;
@@ -167,7 +178,6 @@
     filterKategori.addEventListener('change', updateFilter);
     filterRegion.addEventListener('change', updateFilter);
 
-    // Kör initial filter
     updateFilter();
 
 </script>
